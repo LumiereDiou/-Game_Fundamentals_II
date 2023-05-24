@@ -71,3 +71,4 @@ std::vector<State*>& StateManager::GetStates()
 {
 	return s_states;
 }
+

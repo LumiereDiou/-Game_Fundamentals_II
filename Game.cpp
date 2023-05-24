@@ -1,5 +1,8 @@
 #include <iostream>
 #include "Game.h"
+#include "StateManager.h"
+#include "States.h"
+
 
 Game::Game()
 	: m_running(false)
@@ -65,6 +68,7 @@ int Game::Init(const char* title, int xPos, int yPos)
 		return -1;
 	}
 	std::cout << "Initialization successful!!!" << std::endl;
+	StateManager::PushState(new TitleState());
 	m_keyStates = SDL_GetKeyboardState(nullptr);
 	m_running = true;
 	return 0;
@@ -100,31 +104,19 @@ bool Game::KeyDown(SDL_Scancode key)
 
 void Game::Update(float deltaTime)
 {
-	if (KeyDown(SDL_SCANCODE_W))
-		m_RectangleTransform.y -= kRectangeSpeed * deltaTime;
-	if (KeyDown(SDL_SCANCODE_S))
-		m_RectangleTransform.y += kRectangeSpeed * deltaTime;
-	if (KeyDown(SDL_SCANCODE_A))
-		m_RectangleTransform.x -= kRectangeSpeed * deltaTime;
-	if (KeyDown(SDL_SCANCODE_D))
-		m_RectangleTransform.x += kRectangeSpeed * deltaTime;
+	StateManager::Update(deltaTime);
 }
 
 void Game::Render()
 {
-	SDL_SetRenderDrawColor(m_pRenderer, 0, 128, 255, 255);
-	SDL_RenderClear(m_pRenderer);
-	// Any drawing here...
-
-	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 255, 255);
-	SDL_RenderFillRectF(m_pRenderer, &m_RectangleTransform);
-
+	StateManager::Render();
 	SDL_RenderPresent(m_pRenderer); // Flip buffers - send data to window.
 }
 
 void Game::Clean()
 {
 	std::cout << "Cleaning engine..." << std::endl;
+	StateManager::Quit();
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();
