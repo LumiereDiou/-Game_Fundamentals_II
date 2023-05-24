@@ -9,7 +9,7 @@ private:
 	static const int kRectangeSpeed = 300;
 
 public:
-	Game();
+	static Game& GetInstance();
 	int Init(const char* title, int xPos, int yPos);
 	bool IsRunning();
 	void HandleEvents();
@@ -22,6 +22,7 @@ public:
 	SDL_Renderer* GetRenderer() { return m_pRenderer; }
 
 private:
+	Game(); //private constructor
 	bool m_running;
 	SDL_Window* m_pWindow;
 	SDL_Renderer* m_pRenderer;
