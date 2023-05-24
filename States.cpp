@@ -44,6 +44,11 @@ void GameState::Update(float deltaTime)
 		std::cout << "Changing to TitleState..." << std::endl;
 		StateManager::ChangeState(new TitleState()); // Change to new TitleState
 	}
+	else if (Game::GetInstance().KeyDown(SDL_SCANCODE_P))
+	{
+		std::cout << "Changing to PauseState..." << std::endl;
+		StateManager::ChangeState(new PauseState()); // Add new PauseState
+	}
 }
 
 void GameState::Render()
@@ -64,3 +69,10 @@ void GameState::Resume()
 	std::cout << "Resuming GameState..." << std::endl;
 }
 // End GameState
+
+// Begin PauseState
+void PauseState::Enter()
+{
+	std::cout << "Entering PauseState..." << std::endl;
+}
+

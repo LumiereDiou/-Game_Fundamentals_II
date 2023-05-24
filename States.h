@@ -31,3 +31,12 @@ public:
 	virtual void Exit() override;
 	virtual void Resume() override;
 };
+
+class PauseState : public State
+{
+public:
+	virtual void Enter() override;
+	virtual void Update(float deltaTime) override;
+	virtual void Render() override;
+	virtual void Exit() override;
+};
