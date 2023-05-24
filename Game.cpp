@@ -11,6 +11,12 @@ Game::Game()
 
 }
 
+Game& Game::GetInstance()
+{
+	static Game* instance = new Game();
+	return *instance;
+}
+
 int Game::Init(const char* title, int xPos, int yPos)
 {
 	std::cout << "Initializing engine..." << std::endl;

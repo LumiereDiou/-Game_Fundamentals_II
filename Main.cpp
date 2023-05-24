@@ -4,14 +4,14 @@
 
 int main(int argc, char* argv[])
 {
-	Game myGame;
-	int result = myGame.Init("GAME1017", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	Game& myGameInstance = Game::GetInstance();
+	int result = myGameInstance.Init("GAME1017", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	if (result == 0)
 	{
 		// Allocate a time_point outside that loop so that it is retained between frames.
 		auto lastFrameTime = std::chrono::high_resolution_clock::now();
-		while (myGame.IsRunning())
+		while (myGameInstance.IsRunning())
 		{
 			// Get current time_point.
 			auto thisFrameTime = std::chrono::high_resolution_clock::now();
@@ -25,11 +25,11 @@ int main(int argc, char* argv[])
 			//Don't forget to pass newFrameCounter into lastFrameCounter.
 			lastFrameTime = thisFrameTime;
 
-			myGame.HandleEvents();
-			myGame.Update(deltaTime);
-			myGame.Render();
+			myGameInstance.HandleEvents();
+			myGameInstance.Update(deltaTime);
+			myGameInstance.Render();
 		}
-		myGame.Clean();
+		myGameInstance.Clean();
 	}
 	return result;
 }
