@@ -8,7 +8,6 @@ Game::Game()
 	: m_running(false)
 	, m_pWindow(nullptr)
 	, m_pRenderer(nullptr)
-	, m_RectangleTransform{ kWidth / 2, kHeight / 2, 100, 100 }
 	, m_keyStates(nullptr)
 {
 
@@ -16,8 +15,8 @@ Game::Game()
 
 Game& Game::GetInstance()
 {
-	static Game* instance = new Game();
-	return *instance;
+	static Game* pInstance = new Game();
+	return *pInstance;
 }
 
 int Game::Init(const char* title, int xPos, int yPos)
@@ -68,8 +67,11 @@ int Game::Init(const char* title, int xPos, int yPos)
 		return -1;
 	}
 	std::cout << "Initialization successful!!!" << std::endl;
+	
 	StateManager::PushState(new TitleState());
+	
 	m_keyStates = SDL_GetKeyboardState(nullptr);
+	
 	m_running = true;
 	return 0;
 }
@@ -109,6 +111,7 @@ void Game::Update(float deltaTime)
 
 void Game::Render()
 {
+
 	StateManager::Render();
 	SDL_RenderPresent(m_pRenderer); // Flip buffers - send data to window.
 }
@@ -120,4 +123,6 @@ void Game::Clean()
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();
+
+	delete this;
 }

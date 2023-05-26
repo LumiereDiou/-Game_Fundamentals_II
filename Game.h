@@ -4,11 +4,11 @@
 class Game
 {
 private:
+	Game(); //private constructor
+public:
 	static const int kWidth = 1024;
 	static const int kHeight = 768;
-	static const int kRectangeSpeed = 300;
 
-public:
 	static Game& GetInstance();
 	int Init(const char* title, int xPos, int yPos);
 	bool IsRunning();
@@ -22,11 +22,8 @@ public:
 	SDL_Renderer* GetRenderer() { return m_pRenderer; }
 
 private:
-	Game(); //private constructor
 	bool m_running;
 	SDL_Window* m_pWindow;
 	SDL_Renderer* m_pRenderer;
-
-	SDL_FRect m_RectangleTransform;
 	const Uint8* m_keyStates;
 };
