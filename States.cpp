@@ -3,6 +3,7 @@
 #include "StateManager.h"
 #include "GameObject.h"
 #include <iostream>
+#include "CollisionManager.h"
 
 
 
@@ -14,13 +15,13 @@ void TitleState::Enter()
 
 void TitleState::Update(float deltaTime)
 {
-	Game& GameInstance = Game::GetInstance();
+	timer += deltaTime;
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_M))
+	if (timer >= 4.0f)
 	{
-		std::cout << "Changing to GameState..." << std::endl;
 		StateManager::ChangeState(new MenuState());
 	}
+	
 }
 
 void TitleState::Render()
@@ -61,7 +62,7 @@ void MenuState::Update(float deltaTime)
 
 void MenuState::Render()
 {
-	std::cout << "Rendering MenuState..." << std::endl;
+	//std::cout << "Rendering MenuState..." << std::endl;
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 128, 0, 128, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 }
@@ -92,7 +93,7 @@ void CreditState::Update(float deltaTime)
 
 void CreditState::Render()
 {
-	std::cout << "Rendering CreditState..." << std::endl;
+	//std::cout << "Rendering CreditState..." << std::endl;
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 225, 192, 203, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 }
@@ -111,14 +112,22 @@ void GameState::Enter() // Used for initialization
 	m_gameObjects.push_back(new GameObject(400, 100,30, 30));
 	m_gameObjects.push_back(new GameObject(700, 100,30, 30));
 
-	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 100, 100, 255, 0, 0, 255);
+	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 100, 100, 255, 255, 255, 255);
 	m_gameObjects.push_back(m_pPlayer);
 
 }
 
 void GameState::Update(float deltaTime)
 {
+	timer += deltaTime;
+
+	if (timer >= 20.0f)
+	{
+		StateManager::ChangeState(new WinState());
+	}
+
 	Game& GameInstance = Game::GetInstance();
+
 	if (GameInstance.KeyDown(SDL_SCANCODE_P))
 	{
 		std::cout << "Changing to PauseState..." << std::endl;
@@ -142,12 +151,26 @@ void GameState::Update(float deltaTime)
 		{
 			m_pPlayer->UpdatePositionX(kPlayerSpeed * deltaTime);
 		}
+
+		// Check for collision
+		for (GameObject* pObject : m_gameObjects)
+		{
+			if (pObject != m_pPlayer)
+			{
+				if (CollisionManager::AABBCheck(m_pPlayer->GetTransform(), pObject->GetTransform()))
+				{
+					std::cout << "Player Object Collision" << std::endl;
+					StateManager::PushState(new LoseState());
+				}
+			}
+		}
 	}
+	
 }
 
 void GameState::Render()
 {
-	std::cout << "Rendering GameState..." << std::endl;
+	//std::cout << "Rendering GameState..." << std::endl;
 	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
 	
 	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
@@ -187,18 +210,17 @@ void PauseState::Update(float deltaTime)
 {
 	if (Game::GetInstance().KeyDown(SDL_SCANCODE_ESCAPE))
 	{
-		std::cout << "Leaving PauseState..." << std::endl;
 		StateManager::PopState();
 	}
 }
 
 void PauseState::Render()
 {
-	std::cout << "Rendering PauseState..." << std::endl;
+	//std::cout << "Rendering PauseState..." << std::endl;
 	// First render the GameSate
-	StateManager::GetStates().front()->Render();
 	// Now render rest of PauseState
-	SDL_SetRenderDrawBlendMode(Game::GetInstance().GetRenderer(), SDL_BLENDMODE_BLEND);
+	//SDL_SetRenderDrawBlendMode(Game::GetInstance().GetRenderer(), SDL_BLENDMODE_BLEND);
+	StateManager::GetStates().front()->Render();
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 128, 128, 128, 128);
 	SDL_Rect rect = { 256, 128, 512, 512 };
 	SDL_RenderFillRect(Game::GetInstance().GetRenderer(), &rect);
@@ -230,7 +252,7 @@ void WinState::Update(float deltaTime)
 
 void WinState::Render()
 {
-	std::cout << "Rendering WinState..." << std::endl;
+	//std::cout << "Rendering WinState..." << std::endl;
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 0, 225, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 }
@@ -261,7 +283,7 @@ void LoseState::Update(float deltaTime)
 
 void LoseState::Render()
 {
-	std::cout << "Rendering LoseState..." << std::endl;
+	//std::cout << "Rendering LoseState..." << std::endl;
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 225, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 }

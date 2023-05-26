@@ -19,6 +19,7 @@ public:
 
 class TitleState : public State
 {
+	float timer = 0.0f;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
@@ -49,6 +50,7 @@ class GameState : public State
 	static const int kPlayerSpeed = 400;
 	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_pPlayer;
+	float timer = 0.0f;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
