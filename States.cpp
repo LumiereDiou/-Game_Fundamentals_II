@@ -220,7 +220,7 @@ void PauseState::Render()
 	// First render the GameSate
 	// Now render rest of PauseState
 	//SDL_SetRenderDrawBlendMode(Game::GetInstance().GetRenderer(), SDL_BLENDMODE_BLEND);
-	StateManager::GetStates().front()->Render();
+	//StateManager::GetStates().front()->Render();
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 128, 128, 128, 128);
 	SDL_Rect rect = { 256, 128, 512, 512 };
 	SDL_RenderFillRect(Game::GetInstance().GetRenderer(), &rect);
