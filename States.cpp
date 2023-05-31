@@ -2,9 +2,9 @@
 #include "Game.h"
 #include "StateManager.h"
 #include "GameObject.h"
-#include <iostream>
 #include "CollisionManager.h"
-
+#include "AnimatedSprite.h"
+#include <iostream>
 
 
 //Begin TitleState
@@ -108,12 +108,27 @@ void CreditState::Exit()
 void GameState::Enter() // Used for initialization
 {
 	std::cout << "Entering GameState..." << std::endl;
+	
 	m_gameObjects.push_back(new GameObject(100, 100,30, 30));
 	m_gameObjects.push_back(new GameObject(400, 100,30, 30));
 	m_gameObjects.push_back(new GameObject(700, 100,30, 30));
 
 	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 100, 100, 255, 255, 255, 255);
 	m_gameObjects.push_back(m_pPlayer);
+
+	//SDL_Surface* pImageSurface = IMG_Load("assets/goomba.png");
+	//if (pImageSurface == nullptr)
+	//{
+	//	std::cout << "Failed to load image. Error: " << SDL_GetError() << std::endl;
+	//}
+	//else
+	//{
+	//	m_pPlayerTexture = SDL_CreateTextureFromSurface(Game::GetInstance().GetRenderer(), pImageSurface);
+	//	// set player width and height transform based on the texture
+	//	SDL_FreeSurface(pImageSurface);
+	//}
+
+	m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
 
 }
 
@@ -178,8 +193,15 @@ void GameState::Render()
 	
 	for (GameObject* pObject : m_gameObjects)
 	{
-		pObject->Draw(pRenderer);
+		if (pObject != m_pPlayer)
+		{
+			pObject->Draw(pRenderer);
+		}
 	}
+
+	SDL_Rect playerIntRect = MathManager::ConvertFRect2Rect(m_pPlayer->GetTransform());
+
+	SDL_RenderCopy(pRenderer, m_pPlayerTexture, nullptr, &playerIntRect);
 }
 
 void GameState::Exit()
@@ -191,6 +213,8 @@ void GameState::Exit()
 		delete pObject;
 		pObject = nullptr;
 	}
+
+	SDL_DestroyTexture(m_pPlayerTexture);
 }
 
 
