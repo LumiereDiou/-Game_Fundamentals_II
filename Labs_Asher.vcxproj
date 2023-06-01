@@ -171,6 +171,7 @@ copy "$(SolutionDir)lib\SDL_Image\lib\x64\SDL2_image.dll" "$(OutDir)"</Command>
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MathManager.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="StateManager.h" />
   </ItemGroup>
@@ -180,6 +181,7 @@ copy "$(SolutionDir)lib\SDL_Image\lib\x64\SDL2_image.dll" "$(OutDir)"</Command>
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathManager.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="States.cpp" />
     <ClCompile Include="StateManager.cpp" />
   </ItemGroup>
