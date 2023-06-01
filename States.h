@@ -4,6 +4,7 @@
 #include <SDL_image.h>
 
 class GameObject;
+class AnimatedSprite;
 
 class State // This is the abstract base class for all states
 {
@@ -49,7 +50,7 @@ public:
 class GameState : public State
 {
 	static const int kPlayerSpeed = 400;
-	std::vector<GameObject*> m_gameObjects;
+	std::vector<AnimatedSprite*> m_gameObjects;
 	GameObject* m_pPlayer;
 	float timer = 0.0f;
 
