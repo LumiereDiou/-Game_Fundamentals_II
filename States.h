@@ -55,6 +55,7 @@ class GameState : public State
 	float timer = 0.0f;
 
 	SDL_Texture* m_pPlayerTexture;
+	SDL_Texture* m_pObjectTexture;
 
 public:
 	virtual void Enter() override;

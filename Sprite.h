@@ -13,6 +13,6 @@ public:
 	Sprite(SDL_Rect sourceTransform, SDL_FRect destinationTransfrom, int angle);
 	SDL_Rect& GetSourceTransform() { return m_sourceTransfrom; }
 	SDL_FRect& GetDestinationTransform() { return m_destinationTransfrom; }
-	int getAngle() { return m_angle; }
+	int GetAngle() { return m_angle; }
 };
 
