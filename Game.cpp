@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "StateManager.h"
 #include "States.h"
+#include "TextureManager.h"
 
 
 Game::Game()
@@ -66,6 +67,12 @@ int Game::Init(const char* title, int xPos, int yPos)
 		system("pause");
 		return -1;
 	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048))
+	{
+		std::cout << "Mix_OpenAudio() failed. Error: " << SDL_GetError() << std::endl;
+	}
+
 	std::cout << "Initialization successful!!!" << std::endl;
 	
 	StateManager::PushState(new TitleState());
@@ -120,6 +127,7 @@ void Game::Clean()
 {
 	std::cout << "Cleaning engine..." << std::endl;
 	StateManager::Quit();
+	TextureManager::Quit();
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();

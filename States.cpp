@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "CollisionManager.h"
 #include "AnimatedSprite.h"
+#include "TextureManager.h"
 #include <iostream>
 
 
@@ -109,12 +110,18 @@ void GameState::Enter() // Used for initialization
 {
 	std::cout << "Entering GameState..." << std::endl;
 	
-	m_gameObjects.push_back(new GameObject(100, 100,30, 30));
-	m_gameObjects.push_back(new GameObject(400, 100,30, 30));
-	m_gameObjects.push_back(new GameObject(700, 100,30, 30));
+	//m_gameObjects.push_back(new GameObject(100, 100,30, 30));
+	//m_gameObjects.push_back(new GameObject(400, 100,30, 30));
+	//m_gameObjects.push_back(new GameObject(700, 100,30, 30));
+
+	SDL_Rect sourceTransform{ 0, 0, 64, 64 };
+	m_gameObjects.push_back(new AnimatedSprite(0, 0.01f, 3, sourceTransform, { 100, 100, 64, 64 }));
+	m_gameObjects.push_back(new AnimatedSprite(0, 0.02f, 3, sourceTransform, { 400, 100, 64, 64 }));
+	m_gameObjects.push_back(new AnimatedSprite(0, 0.03f, 3, sourceTransform, { 700, 100, 64, 64 }));
+	
 
 	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 100, 100, 255, 255, 255, 255);
-	m_gameObjects.push_back(m_pPlayer);
+	//m_gameObjects.push_back(m_pPlayer);
 
 	//SDL_Surface* pImageSurface = IMG_Load("assets/goomba.png");
 	//if (pImageSurface == nullptr)
@@ -128,7 +135,19 @@ void GameState::Enter() // Used for initialization
 	//	SDL_FreeSurface(pImageSurface);
 	//}
 
-	m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
+	//m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
+	//m_pObjectTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/portal.png");
+
+	TextureManager::Load("assets/goomba.png", "playerTexture");
+	TextureManager::Load("assets/portal.png", "portalTexture");
+
+	m_pPlayerTexture = TextureManager::GetTexture("playerTexture");
+
+	m_pObjectTexture = TextureManager::GetTexture("portalTexture");
+
+	m_pMusic = Mix_LoadMUS("assets/music.wav");
+
+	Mix_PlayMusic(m_pMusic, -1);
 
 }
 
@@ -167,16 +186,40 @@ void GameState::Update(float deltaTime)
 			m_pPlayer->UpdatePositionX(kPlayerSpeed * deltaTime);
 		}
 
-		// Check for collision
-		for (GameObject* pObject : m_gameObjects)
+		for (AnimatedSprite* pObject : m_gameObjects)
 		{
-			if (pObject != m_pPlayer)
+			pObject->Animate(deltaTime);
+		}
+
+		// Check for collision
+		//for (AnimatedSprite* pObject : m_gameObjects)
+		//{
+		//	//if (pObject != m_pPlayer)
+		//	//{
+		//		if (CollisionManager::AABBCheck(m_pPlayer->GetTransform(), pObject->GetDestinationTransform()))
+		//		{
+		//			std::cout << "Player Object Collision" << std::endl;
+		//			StateManager::PushState(new LoseState());
+		//		}
+		//	//}
+		//}
+
+		for (std::vector< AnimatedSprite*>::iterator it = m_gameObjects.begin(); it != m_gameObjects.end();)
+		{
+			// get game object from iterator
+			AnimatedSprite* pObject = (*it);
+
+			if (CollisionManager::AABBCheck(m_pPlayer->GetTransform(), pObject->GetDestinationTransform()))
 			{
-				if (CollisionManager::AABBCheck(m_pPlayer->GetTransform(), pObject->GetTransform()))
-				{
-					std::cout << "Player Object Collision" << std::endl;
-					StateManager::PushState(new LoseState());
-				}
+				std::cout << "Player Object Collision" << std::endl;
+				it = m_gameObjects.erase(it);
+				delete pObject;
+				pObject = nullptr;
+				//StateManager::PushState(new LoseState());
+			}
+			else
+			{
+				++it;
 			}
 		}
 	}
@@ -191,16 +234,18 @@ void GameState::Render()
 	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
 	SDL_RenderClear(pRenderer);
 	
-	for (GameObject* pObject : m_gameObjects)
+	for (AnimatedSprite* pObject : m_gameObjects)
 	{
-		if (pObject != m_pPlayer)
+		//if (pObject != m_pPlayer)
 		{
-			pObject->Draw(pRenderer);
+			//pObject->Draw(pRenderer);
+			SDL_FPoint pivot = { 0, 0 };
+			SDL_RenderCopyExF(pRenderer, m_pObjectTexture, &(pObject->GetSourceTransform()),
+				&(pObject->GetDestinationTransform()), pObject->GetAngle(), &pivot, SDL_FLIP_NONE);
 		}
 	}
 
 	SDL_Rect playerIntRect = MathManager::ConvertFRect2Rect(m_pPlayer->GetTransform());
-
 	SDL_RenderCopy(pRenderer, m_pPlayerTexture, nullptr, &playerIntRect);
 }
 
@@ -208,13 +253,20 @@ void GameState::Exit()
 {
 	std::cout << "Exiting GameState..." << std::endl;
 	
-	for (GameObject* pObject : m_gameObjects)
+	for (AnimatedSprite* pObject : m_gameObjects)
 	{
 		delete pObject;
 		pObject = nullptr;
 	}
 
+	delete m_pPlayer;
+	m_pPlayer = nullptr;
+
 	SDL_DestroyTexture(m_pPlayerTexture);
+	SDL_DestroyTexture(m_pObjectTexture);
+
+	Mix_FreeMusic(m_pMusic);
+	m_pMusic = nullptr;
 }
 
 
