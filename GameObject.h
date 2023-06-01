@@ -11,10 +11,14 @@ public:
 	GameObject(const SDL_FRect destination)
 		: m_destinationTransform(destination)
 	{ }
-	void Draw(SDL_Renderer* pRenderer);
-	void UpdatePositionX(float x);
-	void UpdatePositionY(float y);
-	SDL_FRect& GetTransform() { return m_Transform; }
+
+	virtual ~GameObject() = default;
+
+	
+	virtual void Update(float deltaTime) = 0;
+	virtual void Render() = 0;
+	
+	SDL_FRect* GetDestinatioTransform() { return &m_destinationTransform; }
 
 protected:
 	SDL_FRect m_destinationTransform;

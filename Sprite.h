@@ -1,19 +1,19 @@
 #pragma once
-#include <SDL.h>
+#include "GameObject.h"
 
-class Sprite
+
+class SpriteObject : public GameObject
 {
-protected:
-	SDL_Rect m_sourceTransform;
-	SDL_FRect m_destinationTransform;
-	int m_angle;
 
 public:
-	Sprite();
-	Sprite(SDL_Rect m_sourceTransform, SDL_FRect m_destinationTransform, int m_angle);
-	SDL_Rect& GetSourceTransform() { return m_sourceTransform; }
-	SDL_FRect& GetDestinationTransform() { return m_destinationTransform; }
-	int GetAngle() { return m_angle; }
+	SpriteObject(const SDL_Rect source, const SDL_FRect destination)
+		: GameObject(destination)
+		, m_sourceTransform(source)
+	{ }
+	
+	SDL_Rect* GetSourceTransform() { return &m_sourceTransform; }
 
+protected:
+	SDL_Rect m_sourceTransform;
 };
 
