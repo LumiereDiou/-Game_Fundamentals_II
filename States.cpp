@@ -3,7 +3,7 @@
 #include "StateManager.h"
 #include "GameObject.h"
 #include "CollisionManager.h"
-#include "AnimatedSprite.h"
+//#include "AnimatedSprite.h"
 #include <iostream>
 
 
@@ -116,19 +116,19 @@ void GameState::Enter() // Used for initialization
 	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 100, 100, 255, 255, 255, 255);
 	m_gameObjects.push_back(m_pPlayer);
 
-	//SDL_Surface* pImageSurface = IMG_Load("assets/goomba.png");
-	//if (pImageSurface == nullptr)
-	//{
-	//	std::cout << "Failed to load image. Error: " << SDL_GetError() << std::endl;
-	//}
-	//else
-	//{
-	//	m_pPlayerTexture = SDL_CreateTextureFromSurface(Game::GetInstance().GetRenderer(), pImageSurface);
-	//	// set player width and height transform based on the texture
-	//	SDL_FreeSurface(pImageSurface);
-	//}
+	SDL_Surface* pImageSurface = IMG_Load("assets/goomba.png");
+	if (pImageSurface == nullptr)
+	{
+		std::cout << "Failed to load image. Error: " << SDL_GetError() << std::endl;
+	}
+	else
+	{
+		m_pPlayerTexture = SDL_CreateTextureFromSurface(Game::GetInstance().GetRenderer(), pImageSurface);
+		// set player width and height transform based on the texture
+		SDL_FreeSurface(pImageSurface);
+	}
 
-	m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
+	//m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
 
 }
 

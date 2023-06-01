@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL.h"
 #include <vector>
+#include <SDL_image.h>
 
 class GameObject;
 
@@ -51,6 +52,9 @@ class GameState : public State
 	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_pPlayer;
 	float timer = 0.0f;
+
+	SDL_Texture* m_pPlayerTexture;
+
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
