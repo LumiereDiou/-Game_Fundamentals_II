@@ -10,7 +10,7 @@ protected:
 
 public:
 	Sprite();
-	Sprite(SDL_Rect sourceTransform, SDL_FRect m_destinationTransfrom, int angle);
+	Sprite(SDL_Rect sourceTransform, SDL_FRect destinationTransfrom, int angle);
 	SDL_Rect& GetSourceTransform() { return m_sourceTransfrom; }
 	SDL_FRect& GetDestinationTransform() { return m_destinationTransfrom; }
 	int getAngle() { return m_angle; }
