@@ -11,6 +11,7 @@
 void TitleState::Enter()
 {
 	std::cout << "Entering TitleState..." << std::endl;
+	m_pDeveloperTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/profile.jpg");
 }
 
 void TitleState::Update(float deltaTime)
@@ -26,14 +27,20 @@ void TitleState::Update(float deltaTime)
 
 void TitleState::Render()
 {
+	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
 	std::cout << "Rendering TitleState..." << std::endl;
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 255, 255, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
+
+	SDL_Rect srcRect{ 0, 0, 826, 842 };
+	SDL_Rect dstRect{ (1024/2) - 200,(768/2) - 200,400, 400};
+	SDL_RenderCopy(pRenderer, m_pDeveloperTexture, &srcRect, &dstRect);
 }
 
 void TitleState::Exit()
 {
 	std::cout << "Exiting TitleState..." << std::endl;
+	SDL_DestroyTexture(m_pDeveloperTexture);
 }
 // End TitleState
 

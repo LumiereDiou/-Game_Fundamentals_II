@@ -22,6 +22,7 @@ public:
 
 class TitleState : public State
 {
+	SDL_Texture* m_pDeveloperTexture;
 	float timer = 0.0f;
 public:
 	virtual void Enter() override;
