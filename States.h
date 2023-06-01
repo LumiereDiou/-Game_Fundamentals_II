@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include <vector>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 class GameObject;
 class AnimatedSprite;
@@ -56,6 +57,8 @@ class GameState : public State
 
 	SDL_Texture* m_pPlayerTexture;
 	SDL_Texture* m_pObjectTexture;
+
+	Mix_Music* m_pMusic;
 
 public:
 	virtual void Enter() override;
