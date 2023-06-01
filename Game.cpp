@@ -66,6 +66,15 @@ int Game::Init(const char* title, int xPos, int yPos)
 		system("pause");
 		return -1;
 	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048))
+	{
+		std::cout << "Mix_OpenAudio() succeeded." << std::endl;
+	}
+	else
+	{
+		std::cout << "Mix_OpenAudio() failed. Error: " << SDL_GetError() << std::endl;
+	}
 	std::cout << "Initialization successful!!!" << std::endl;
 	
 	StateManager::PushState(new TitleState());

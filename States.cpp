@@ -135,6 +135,11 @@ void GameState::Enter() // Used for initialization
 
 	m_pObjectTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/portal.png");
 	m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
+
+	m_pMusic = Mix_LoadMUS("assets/music.wav");
+
+	Mix_PlayMusic(m_pMusic, -1);
+
 }
 
 void GameState::Update(float deltaTime)
@@ -209,16 +214,16 @@ void GameState::Render()
 	
 	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
 	SDL_RenderClear(pRenderer);
-	
-	for (AnimatedSprite* pObject : m_gameObjects)
+
+	for (auto pObject : m_gameObjects)
 	{
 		//if (pObject != m_pPlayer)
-		{
+		
 			//pObject->Draw(pRenderer);
 			SDL_FPoint pivot = { 0, 0 };
 			SDL_RenderCopyExF(pRenderer, m_pObjectTexture, &(pObject->GetSourceTransform()),
 				&(pObject->GetDestinationTransform()), pObject->GetAngle(), &pivot, SDL_FLIP_NONE);
-		}
+		
 	}
 
 	SDL_Rect playerIntRect = MathManager::ConvertFRect2Rect(m_pPlayer->GetTransform());
@@ -241,6 +246,9 @@ void GameState::Exit()
 
 	SDL_DestroyTexture(m_pPlayerTexture);
 	SDL_DestroyTexture(m_pObjectTexture);
+	Mix_FreeMusic(m_pMusic);
+	m_pMusic = nullptr;
+
 }
 
 
