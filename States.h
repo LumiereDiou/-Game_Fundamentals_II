@@ -1,11 +1,8 @@
 #pragma once
 #include "SDL.h"
 #include <vector>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
 
 class GameObject;
-class AnimatedSprite;
 
 class State // This is the abstract base class for all states
 {
@@ -51,14 +48,9 @@ public:
 class GameState : public State
 {
 	static const int kPlayerSpeed = 400;
-	std::vector<AnimatedSprite*> m_gameObjects;
+	std::vector<GameObject*> m_gameObjects;
 	GameObject* m_pPlayer;
 	float timer = 0.0f;
-	SDL_Texture* m_pPlayerTexture;
-	SDL_Texture* m_pObjectTexture;
-
-	Mix_Music* m_pMusic;
-
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
