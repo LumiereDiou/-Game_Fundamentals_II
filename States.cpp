@@ -52,7 +52,7 @@ void MenuState::Enter() // Used for initialization
 	m_pGameNameTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/gamename.jpg");
 	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput.png");
 
-	m_pMusic = Mix_LoadMUS("assets/MainMenu.wav");
+	m_pMusic = Mix_LoadMUS("assets/MainMenu.mp3");
 
 	Mix_PlayMusic(m_pMusic, -1);
 }
@@ -65,6 +65,7 @@ void MenuState::Update(float deltaTime)
 	{
 		std::cout << "Changing to CreditState..." << std::endl;
 		StateManager::ChangeState(new CreditState());
+		
 	}
 	else if (GameInstance.KeyDown(SDL_SCANCODE_G))
 	{
@@ -87,12 +88,12 @@ void MenuState::Render()
 	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 284, 177 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,200, 200 };
 	SDL_RenderCopy(pRenderer, m_pGameNameTexture, &srcRect, &dstRect);
 
 
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	srcRect = { 0, 0, 1316, 1316 };
+	dstRect = { 1024/2,368,400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
@@ -115,7 +116,7 @@ void CreditState::Enter() // Used for initialization
 	m_pNameTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/myName.png");
 	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput1.png");
 
-	m_pMusic = Mix_LoadMUS("assets/MainMenu.wav");
+	m_pMusic = Mix_LoadMUS("assets/MainMenu.mp3");
 
 	Mix_PlayMusic(m_pMusic, -1);
 }
@@ -140,16 +141,16 @@ void CreditState::Render()
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 
 	SDL_Rect srcRect{ 0, 0, 255, 255 };
-	SDL_Rect dstRect{ (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	SDL_Rect dstRect{ (1024 / 2) - 100,(768 / 2) - 300,400, 400 };
 	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { 0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pNameTexture, &srcRect, &dstRect);
 
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { (1024 / 2) - 400,(768 / 2) - 200,400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
@@ -303,7 +304,7 @@ void GameState::Render()
 	SDL_RenderCopy(pRenderer, m_pPlayerTexture, nullptr, &playerIntRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { 0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
@@ -381,7 +382,7 @@ void PauseState::Render()
 	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { 0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 
 }
@@ -432,7 +433,7 @@ void WinState::Render()
 	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = { 0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
@@ -481,7 +482,7 @@ void LoseState::Render()
 	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
+	dstRect = {0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
