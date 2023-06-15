@@ -8,6 +8,6 @@ Sprite::Sprite()
 
 Sprite::Sprite(SDL_Rect sourceTransform, SDL_FRect destinationTransfrom, int angle)
 	: m_sourceTransfrom{ sourceTransform }
-	, m_destinationTransfrom{ m_destinationTransfrom }
+	, m_destinationTransfrom{ destinationTransfrom }
 	, m_angle{ angle }
 { }

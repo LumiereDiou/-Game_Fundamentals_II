@@ -185,6 +185,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /s /e /i/y</Command>
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="StateManager.h" />
+    <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
@@ -196,6 +197,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /s /e /i/y</Command>
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="States.cpp" />
     <ClCompile Include="StateManager.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

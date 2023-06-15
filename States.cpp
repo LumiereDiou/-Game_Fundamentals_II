@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "CollisionManager.h"
 #include "AnimatedSprite.h"
+#include "TextureManager.h"
 #include <iostream>
 
 
@@ -193,12 +194,15 @@ void GameState::Enter() // Used for initialization
 	//	// set player width and height transform based on the texture
 	//	SDL_FreeSurface(pImageSurface);
 	//}
-	m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput2.png");
+	//m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
+	//
+	//m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput2.png");
+	//
+	//m_pObjectTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/portal.png");
+	//m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
 
-	m_pObjectTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/portal.png");
-	m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
+	m_pPlayerTexture = TextureManager::Load("assets/goomba.png", "playerTexture");
+	m_pObjectTexture = TextureManager::Load("assets/portal.png", "portalTexture");
 
 	m_pMusic = Mix_LoadMUS("assets/music.wav");
 	m_pSoundEffect = Mix_LoadWAV("assets/jump.wav");
@@ -364,22 +368,16 @@ void PauseState::Update(float deltaTime)
 void PauseState::Render()
 {
 	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	//std::cout << "Rendering PauseState..." << std::endl;
 	// First render the GameSate
+	StateManager::GetStates().front()->Render();
 	// Now render rest of PauseState
-	//SDL_SetRenderDrawBlendMode(Game::GetInstance().GetRenderer(), SDL_BLENDMODE_BLEND);
-	//StateManager::GetStates().front()->Render();
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 128, 128, 128, 128);
+	SDL_SetRenderDrawBlendMode(pRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(pRenderer, 128, 128, 128, 128);
 	SDL_Rect rect = { 256, 128, 512, 512 };
-	SDL_RenderFillRect(Game::GetInstance().GetRenderer(), &rect);
+	SDL_RenderFillRect(pRenderer, &rect);
 	
 	SDL_Rect srcRect{ 0, 0, 998, 562 };
 	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 255, 255 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
 
 	srcRect = { 0, 0, 2000, 2000 };
 	dstRect = { 0, 0, 400, 400 };
