@@ -6,6 +6,7 @@
 
 class GameObject;
 class AnimatedSprite;
+class TiledLevel;
 
 class State // This is the abstract base class for all states
 {
@@ -62,15 +63,8 @@ public:
 class GameState : public State
 {
 	static const int kPlayerSpeed = 400;
-	std::vector<AnimatedSprite*> m_gameObjects;
-	GameObject* m_pPlayer;
 	float timer = 0.0f;
-
-	SDL_Texture* m_pBackGroundTexture;
-	SDL_Texture* m_pPlayerTexture;
-	SDL_Texture* m_pObjectTexture;
-	SDL_Texture* m_pKeyInputTexture;
-
+	TiledLevel* m_pLevel;
 	Mix_Music* m_pMusic;
 	Mix_Chunk* m_pSoundEffect;
 

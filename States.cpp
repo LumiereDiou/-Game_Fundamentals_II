@@ -5,6 +5,7 @@
 #include "CollisionManager.h"
 #include "AnimatedSprite.h"
 #include "TextureManager.h"
+#include "TiledLevel.h"
 #include <iostream>
 
 
@@ -71,7 +72,7 @@ void MenuState::Update(float deltaTime)
 	else if (GameInstance.KeyDown(SDL_SCANCODE_G))
 	{
 		std::cout << "Changing to GameState..." << std::endl;
-		StateManager::PushState(new GameState());
+		StateManager::ChangeState(new GameState());
 	}
 }
 
@@ -171,38 +172,9 @@ void GameState::Enter() // Used for initialization
 {
 	std::cout << "Entering GameState..." << std::endl;
 	
-	//m_gameObjects.push_back(new GameObject(100, 100,30, 30));
-	//m_gameObjects.push_back(new GameObject(400, 100,30, 30));
-	//m_gameObjects.push_back(new GameObject(700, 100,30, 30));
+	TextureManager::Load("assets/Images/Tiles.png", "tiles");
 
-	SDL_Rect sourceTransform{ 0, 0, 64, 64 };
-	m_gameObjects.push_back(new AnimatedSprite(0, 0.1, 3, sourceTransform, { 100, 100, 64, 64 }));
-	m_gameObjects.push_back(new AnimatedSprite(0, 0.1, 3, sourceTransform, { 400, 100, 64, 64 }));
-	m_gameObjects.push_back(new AnimatedSprite(0, 0.1, 3, sourceTransform, { 700, 100, 64, 64 }));
-
-	m_pPlayer = new GameObject(Game::kWidth / 2, Game::kHeight / 2, 90, 90, 255, 255, 255, 255);
-	//m_gameObjects.push_back(m_pPlayer);
-
-	//SDL_Surface* pImageSurface = IMG_Load("assets/goomba.png");
-	//if (pImageSurface == nullptr)
-	//{
-	//	std::cout << "Failed to load image. Error: " << SDL_GetError() << std::endl;
-	//}
-	//else
-	//{
-	//	m_pPlayerTexture = SDL_CreateTextureFromSurface(Game::GetInstance().GetRenderer(), pImageSurface);
-	//	// set player width and height transform based on the texture
-	//	SDL_FreeSurface(pImageSurface);
-	//}
-	//m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	//
-	//m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput2.png");
-	//
-	//m_pObjectTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/portal.png");
-	//m_pPlayerTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/goomba.png");
-
-	m_pPlayerTexture = TextureManager::Load("assets/goomba.png", "playerTexture");
-	m_pObjectTexture = TextureManager::Load("assets/portal.png", "portalTexture");
+	m_pLevel = new TiledLevel(24, 32, 32, 32, "assets/Data/Tiledata.txt", "assets/Data/Level1.txt", "tiles");
 
 	m_pMusic = Mix_LoadMUS("assets/music.wav");
 	m_pSoundEffect = Mix_LoadWAV("assets/jump.wav");
@@ -230,53 +202,7 @@ void GameState::Update(float deltaTime)
 	}
 	else
 	{
-		if (GameInstance.KeyDown(SDL_SCANCODE_W))
-		{
-			m_pPlayer->UpdatePositionY(-kPlayerSpeed * deltaTime);
-			Mix_PlayChannel(-1, m_pSoundEffect, 0);
-		}
-		if (GameInstance.KeyDown(SDL_SCANCODE_S))
-		{
-			m_pPlayer->UpdatePositionY(kPlayerSpeed * deltaTime);
-			Mix_PlayChannel(-1, m_pSoundEffect, 0);
-		}
-		if (GameInstance.KeyDown(SDL_SCANCODE_A))
-		{
-			m_pPlayer->UpdatePositionX(-kPlayerSpeed * deltaTime);
-			Mix_PlayChannel(-1, m_pSoundEffect, 0);
-		}
-		if (GameInstance.KeyDown(SDL_SCANCODE_D))
-		{
-			m_pPlayer->UpdatePositionX(kPlayerSpeed * deltaTime);
-			Mix_PlayChannel(-1, m_pSoundEffect, 0);
-		}
-
-		for (AnimatedSprite* pObject : m_gameObjects)
-		{
-			pObject->Animate(deltaTime);
-		}
-
-		// Check for collision
-		for (std::vector<AnimatedSprite*>::iterator it = m_gameObjects.begin(); it != m_gameObjects.end();)
-		{
-			AnimatedSprite* pObject = (*it);
-
-			//if (pObject != m_pPlayer)
-			{
-				if (CollisionManager::AABBCheck(m_pPlayer->GetTransform(), pObject->GetDestinationTransform()))
-				{
-					std::cout << "Player Object Collision" << std::endl;
-					it = m_gameObjects.erase(it);
-					delete pObject;
-					pObject = nullptr;
-					//StateManager::PushState(new LoseState());
-				}
-				else
-				{
-					++it;
-				}
-			}
-		}
+		m_pLevel->Update(deltaTime);
 	}
 	
 }
@@ -288,49 +214,18 @@ void GameState::Render()
 	
 	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
 	SDL_RenderClear(pRenderer);
-
-	SDL_Rect srcRect{ 0, 0, 998, 562 };
-	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
-
-	for (auto pObject : m_gameObjects)
-	{
-		//if (pObject != m_pPlayer)
-		
-			//pObject->Draw(pRenderer);
-			SDL_FPoint pivot = { 0, 0 };
-			SDL_RenderCopyExF(pRenderer, m_pObjectTexture, &(pObject->GetSourceTransform()),
-				&(pObject->GetDestinationTransform()), pObject->GetAngle(), &pivot, SDL_FLIP_NONE);
-		
-	}
-
-	SDL_Rect playerIntRect = MathManager::ConvertFRect2Rect(m_pPlayer->GetTransform());
-	SDL_RenderCopy(pRenderer, m_pPlayerTexture, nullptr, &playerIntRect);
-
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { 0, 0, 400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
+	
+	m_pLevel->Render();
 }
 
 void GameState::Exit()
 {
 	std::cout << "Exiting GameState..." << std::endl;
-	
-	for (AnimatedSprite* pObject : m_gameObjects)
-	{
-		delete pObject;
-		pObject = nullptr;
-	}
 
-	delete m_pPlayer;
-	m_pPlayer = nullptr;
+	delete m_pLevel;
+	m_pLevel = nullptr;
 
-	SDL_DestroyTexture(m_pBackGroundTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
-
-	SDL_DestroyTexture(m_pPlayerTexture);
-	SDL_DestroyTexture(m_pObjectTexture);
-
+	TextureManager::Unload("tiles");
 
 	Mix_FreeMusic(m_pMusic);
 	m_pMusic = nullptr;
@@ -378,7 +273,7 @@ void PauseState::Render()
 	
 	SDL_Rect srcRect{ 0, 0, 998, 562 };
 	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-
+	
 	srcRect = { 0, 0, 2000, 2000 };
 	dstRect = { 0, 0, 400, 400 };
 	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);

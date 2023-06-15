@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "Game.h"
 
+/*
 GameObject::GameObject(float x, float y, float w, float h, 
 					   Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	: m_Transform { x, y, w, h }
@@ -23,3 +24,5 @@ void GameObject::UpdatePositionY(float y)
 {
 	m_Transform.y += y;
 }
+
+*/
