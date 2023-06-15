@@ -2,6 +2,8 @@
 #include "Game.h"
 #include "StateManager.h"
 #include "States.h"
+#include "TextureManager.h"
+#include "EventManager.h"
 
 
 Game::Game()
@@ -77,6 +79,8 @@ int Game::Init(const char* title, int xPos, int yPos)
 	}
 	std::cout << "Initialization successful!!!" << std::endl;
 	
+	EventManager::Init();
+
 	StateManager::PushState(new TitleState());
 	
 	m_keyStates = SDL_GetKeyboardState(nullptr);
@@ -92,25 +96,7 @@ bool Game::IsRunning()
 
 void Game::HandleEvents()
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-		case SDL_QUIT:
-			m_running = false;
-			break;
-		}
-	}
-}
-
-bool Game::KeyDown(SDL_Scancode key)
-{
-	if (m_keyStates)
-	{
-		return m_keyStates[key] == 1;
-	}
-	return false;
+	EventManager::HandleEvents();
 }
 
 void Game::Update(float deltaTime)
@@ -120,15 +106,21 @@ void Game::Update(float deltaTime)
 
 void Game::Render()
 {
-
 	StateManager::Render();
 	SDL_RenderPresent(m_pRenderer); // Flip buffers - send data to window.
+}
+
+void Game::Quit()
+{
+	m_running = false;
 }
 
 void Game::Clean()
 {
 	std::cout << "Cleaning engine..." << std::endl;
 	StateManager::Quit();
+	TextureManager::Quit();
+	EventManager::Quit();
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();

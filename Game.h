@@ -13,10 +13,10 @@ public:
 	int Init(const char* title, int xPos, int yPos);
 	bool IsRunning();
 	void HandleEvents();
-	bool KeyDown(SDL_Scancode key);
 	void Update(float deltaTime);
 	void Render();
 	void Clean();
+	void Quit();
 
 	SDL_Window* GetWindow() { return m_pWindow; }
 	SDL_Renderer* GetRenderer() { return m_pRenderer; }

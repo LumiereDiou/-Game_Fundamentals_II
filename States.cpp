@@ -5,6 +5,7 @@
 #include "CollisionManager.h"
 #include "AnimatedSprite.h"
 #include "TextureManager.h"
+#include "EventManager.h"
 #include "TiledLevel.h"
 #include <iostream>
 
@@ -63,13 +64,13 @@ void MenuState::Update(float deltaTime)
 {
 	Game& GameInstance = Game::GetInstance();
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_C))
+	if (EventManager::KeyPressed(SDL_SCANCODE_C))
 	{
 		std::cout << "Changing to CreditState..." << std::endl;
 		StateManager::ChangeState(new CreditState());
 		
 	}
-	else if (GameInstance.KeyDown(SDL_SCANCODE_G))
+	else if (EventManager::KeyPressed(SDL_SCANCODE_G))
 	{
 		std::cout << "Changing to GameState..." << std::endl;
 		StateManager::ChangeState(new GameState());
@@ -127,7 +128,7 @@ void CreditState::Update(float deltaTime)
 {
 	Game& GameInstance = Game::GetInstance();
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_ESCAPE))
+	if (EventManager::KeyPressed(SDL_SCANCODE_ESCAPE))
 	{
 		std::cout << "Changing to MenuState..." << std::endl;
 		StateManager::ChangeState(new MenuState());
@@ -194,7 +195,7 @@ void GameState::Update(float deltaTime)
 
 	Game& GameInstance = Game::GetInstance();
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_P))
+	if (EventManager::KeyPressed(SDL_SCANCODE_P))
 	{
 		std::cout << "Changing to PauseState..." << std::endl;
 		StateManager::PushState(new PauseState()); // Add new PauseState
@@ -253,7 +254,7 @@ void PauseState::Enter()
 
 void PauseState::Update(float deltaTime)
 {
-	if (Game::GetInstance().KeyDown(SDL_SCANCODE_ESCAPE))
+	if (EventManager::KeyPressed(SDL_SCANCODE_ESCAPE))
 	{
 		StateManager::PopState();
 		Mix_ResumeMusic();
@@ -302,7 +303,7 @@ void WinState::Update(float deltaTime)
 {
 	Game& GameInstance = Game::GetInstance();
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_SPACE))
+	if (EventManager::KeyPressed(SDL_SCANCODE_SPACE))
 	{
 		std::cout << "Changing to MenuState..." << std::endl;
 		StateManager::ChangeState(new MenuState());
@@ -352,7 +353,7 @@ void LoseState::Update(float deltaTime)
 {
 	Game& GameInstance = Game::GetInstance();
 
-	if (GameInstance.KeyDown(SDL_SCANCODE_SPACE))
+	if (EventManager::KeyPressed(SDL_SCANCODE_SPACE))
 	{
 		std::cout << "Changing to MenuState..." << std::endl;
 		StateManager::ChangeState(new MenuState());
