@@ -178,6 +178,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /s /e /i/y</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.h" />
+    <ClInclude Include="BackgroundSprite.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="Game.h" />
@@ -196,6 +197,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /s /e /i/y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
+    <ClCompile Include="BackgroundSprite.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="Game.cpp" />

@@ -10,6 +10,7 @@
 #include "TiledLevel.h"
 #include "Tile.h"
 #include "PlatformingPlayer.h"
+#include "BackgroundSprite.h"
 #include "PlayButton.h"
 #include <iostream>
 
@@ -18,21 +19,21 @@
 void TitleState::Enter()
 {
 	std::cout << "Entering TitleState..." << std::endl;
-	m_pDeveloperTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/profile.jpg");
+
 	SoundManager::LoadMusic("assets/Sound/Music/Menu.mp3", "MainMenuMusic");
 	SoundManager::PlayMusic("MainMenuMusic");
 
-	TextureManager::Load("assets/Images/Buttons/play.png", "play");
+	TextureManager::Load("assets/Images/titleScreen.jpg", "title");
 
-	int buttonWidth = 400;
-	int buttonHeight = 100;
-	float buttonX = Game::GetInstance().kWidth / 2.0f - buttonWidth / 2.0f;
-	float buttonY = Game::GetInstance().kHeight / 2.0f - buttonHeight / 2.0f;
+	int buttonWidth = 1280;
+	int buttonHeight = 720;
+	float buttonX = Game::GetInstance().kWidth;
+	float buttonY = Game::GetInstance().kHeight;
 
-	SDL_Rect source{ 0, 0, buttonWidth , buttonHeight };
-	SDL_FRect destination{ buttonX, buttonY, (float)buttonWidth, (float)buttonHeight };
+	SDL_Rect source{ 0, 0, 1280 , 720 };
+	SDL_FRect destination{ 0, 0, (float)Game::GetInstance().kWidth, (float)Game::GetInstance().kHeight };
 
-	m_objects.emplace("play", new PlayButton(source, destination, "play"));
+	m_objects.emplace("title", new BackgroundSprite(source, destination, "title"));
 
 }
 
@@ -40,47 +41,31 @@ void TitleState::Update(float deltaTime)
 {
 	timer += deltaTime;
 
-	for (auto object : m_objects)
+	if (timer >= 4.0f)
 	{
-		object.second->Update(deltaTime);
-		if (StateManager::IsStateChanging())
-		{
-			//StateManager::ChangeState(new GameState());
-			return;
-		}
+		StateManager::ChangeState(new MenuState());
 	}
-	//if (timer >= 4.0f)
-	//{
-	//	StateManager::ChangeState(new MenuState());
-	//}
 	
 }
 
 void TitleState::Render()
 {
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	std::cout << "Rendering TitleState..." << std::endl;
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 255, 255, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 
 	for (auto object : m_objects)
 	{
 		object.second->Render();
 	}
-
-	//SDL_Rect srcRect{ 0, 0, 826, 842 };
-	//SDL_Rect dstRect{ (1024/2) - 200,(768/2) - 200,400, 400};
-	//SDL_RenderCopy(pRenderer, m_pDeveloperTexture, &srcRect, &dstRect);
 }
 
 void TitleState::Exit()
 {
 	std::cout << "Exiting TitleState..." << std::endl;
-	SDL_DestroyTexture(m_pDeveloperTexture);
-	SoundManager::StopMusic();
-	SoundManager::UnloadMusic("MainMenuMusic");
 
-	TextureManager::Unload("play");
+	SoundManager::PauseMusic();
+
+	TextureManager::Unload("title");
+
 	for (auto object : m_objects)
 	{
 		delete object.second;
@@ -94,63 +79,44 @@ void TitleState::Exit()
 void MenuState::Enter() // Used for initialization
 {
 	std::cout << "Entering MenuState..." << std::endl;
-	m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	m_pGameNameTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/gamename.jpg");
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput.png");
 
-	m_pMusic = Mix_LoadMUS("assets/MainMenu.mp3");
-
-	Mix_PlayMusic(m_pMusic, -1);
+	//TextureManager::Load("assets/Images/Buttons/play.png", "play");
+	//
+	//int buttonWidth = 400;
+	//int buttonHeight = 100;
+	//float buttonX = Game::GetInstance().kWidth / 2.0f - buttonWidth / 2.0f;
+	//float buttonY = Game::GetInstance().kHeight / 2.0f - buttonHeight / 2.0f;
+	//
+	//SDL_Rect source{ 0, 0, buttonWidth , buttonHeight };
+	//SDL_FRect destination{ buttonX, buttonY, (float)buttonWidth, (float)buttonHeight };
+	//
+	//m_objects.emplace("play", new PlayButton(source, destination, "play"));
 }
 
 void MenuState::Update(float deltaTime)
 {
-	Game& GameInstance = Game::GetInstance();
 
-	if (EventManager::KeyPressed(SDL_SCANCODE_C))
+	for (auto object : m_objects)
 	{
-		std::cout << "Changing to CreditState..." << std::endl;
-		StateManager::ChangeState(new CreditState());
-		
-	}
-	else if (EventManager::KeyPressed(SDL_SCANCODE_G))
-	{
-		std::cout << "Changing to GameState..." << std::endl;
-		StateManager::ChangeState(new GameState());
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			return;
+		}
 	}
 }
 
 
 void MenuState::Render()
 {
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	//std::cout << "Rendering MenuState..." << std::endl;
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 128, 0, 128, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
-
-
-	SDL_Rect srcRect{ 0, 0, 998, 562 };
-	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 284, 177 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,200, 200 };
-	SDL_RenderCopy(pRenderer, m_pGameNameTexture, &srcRect, &dstRect);
-
-
-	srcRect = { 0, 0, 1316, 1316 };
-	dstRect = { 1024/2,368,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
 void MenuState::Exit()
 {
 	std::cout << "Exiting MenuState..." << std::endl;
-	SDL_DestroyTexture(m_pBackGroundTexture);
-	SDL_DestroyTexture(m_pGameNameTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
-	Mix_FreeMusic(m_pMusic);
-	m_pMusic = nullptr;
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("MainMenuMusic");
 }
 // End MenuState
 
@@ -158,56 +124,22 @@ void MenuState::Exit()
 void CreditState::Enter() // Used for initialization
 {
 	std::cout << "Entering CreditState..." << std::endl;
-	m_pTitleTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/title.jpg");
-	m_pNameTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/myName.png");
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput1.png");
-
-	m_pMusic = Mix_LoadMUS("assets/MainMenu.mp3");
-
-	Mix_PlayMusic(m_pMusic, -1);
 }
 
 void CreditState::Update(float deltaTime)
 {
-	Game& GameInstance = Game::GetInstance();
 
-	if (EventManager::KeyPressed(SDL_SCANCODE_ESCAPE))
-	{
-		std::cout << "Changing to MenuState..." << std::endl;
-		StateManager::ChangeState(new MenuState());
-	}
 }
 
 
 void CreditState::Render()
 {
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	//std::cout << "Rendering CreditState..." << std::endl;
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 225, 192, 203, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
-
-	SDL_Rect srcRect{ 0, 0, 255, 255 };
-	SDL_Rect dstRect{ (1024 / 2) - 100,(768 / 2) - 300,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { 0, 0, 400, 400 };
-	SDL_RenderCopy(pRenderer, m_pNameTexture, &srcRect, &dstRect);
-
-
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { (1024 / 2) - 400,(768 / 2) - 200,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
 void CreditState::Exit()
 {
 	std::cout << "Exiting CreditState..." << std::endl;
-	SDL_DestroyTexture(m_pTitleTexture);
-	SDL_DestroyTexture(m_pNameTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
-	Mix_FreeMusic(m_pMusic);
-	m_pMusic = nullptr;
 }
 // End CreditState
 
@@ -356,9 +288,6 @@ void GameState::Resume()
 void PauseState::Enter()
 {
 	std::cout << "Entering PauseState..." << std::endl;
-	m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	m_pTitleTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/title.jpg");
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput1.png");
 }
 
 void PauseState::Update(float deltaTime)
@@ -381,21 +310,12 @@ void PauseState::Render()
 	SDL_Rect rect = { 256, 128, 512, 512 };
 	SDL_RenderFillRect(pRenderer, &rect);
 	
-	SDL_Rect srcRect{ 0, 0, 998, 562 };
-	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { 0, 0, 400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 
 }
 
 void PauseState::Exit()
 {
 	std::cout << "Exiting PauseState..." << std::endl;
-	SDL_DestroyTexture(m_pBackGroundTexture);
-	SDL_DestroyTexture(m_pTitleTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
 }
 // End PauseState
 
@@ -403,49 +323,22 @@ void PauseState::Exit()
 void WinState::Enter() // Used for initialization
 {
 	std::cout << "Entering WinState..." << std::endl;
-	m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	m_pTitleTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/title.jpg");
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput3.png");
 }
 
 void WinState::Update(float deltaTime)
 {
-	Game& GameInstance = Game::GetInstance();
 
-	if (EventManager::KeyPressed(SDL_SCANCODE_SPACE))
-	{
-		std::cout << "Changing to MenuState..." << std::endl;
-		StateManager::ChangeState(new MenuState());
-	}
 }
 
 
 void WinState::Render()
 {
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	//std::cout << "Rendering WinState..." << std::endl;
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 0, 225, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
-
-	SDL_Rect srcRect{ 0, 0, 998, 562 };
-	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 255, 255 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = { 0, 0, 400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
 void WinState::Exit()
 {
 	std::cout << "Exiting WinState..." << std::endl;
-	SDL_DestroyTexture(m_pBackGroundTexture);
-	SDL_DestroyTexture(m_pTitleTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
 }
 // End WinState
 
@@ -453,47 +346,20 @@ void WinState::Exit()
 void LoseState::Enter() // Used for initialization
 {
 	std::cout << "Entering LoseState..." << std::endl;
-	m_pBackGroundTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/background.bmp");
-	m_pTitleTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/title.jpg");
-	m_pKeyInputTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/kInput3.png");
 }
 
 void LoseState::Update(float deltaTime)
 {
-	Game& GameInstance = Game::GetInstance();
 
-	if (EventManager::KeyPressed(SDL_SCANCODE_SPACE))
-	{
-		std::cout << "Changing to MenuState..." << std::endl;
-		StateManager::ChangeState(new MenuState());
-	}
 }
 
 void LoseState::Render()
 {
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	//std::cout << "Rendering LoseState..." << std::endl;
-	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 225, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
-
-	SDL_Rect srcRect{ 0, 0, 998, 562 };
-	SDL_Rect dstRect{ 0, 0, 1024, 768 };
-	SDL_RenderCopy(pRenderer, m_pBackGroundTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 255, 255 };
-	dstRect = { (1024 / 2) - 200,(768 / 2) - 200,400, 400 };
-	SDL_RenderCopy(pRenderer, m_pTitleTexture, &srcRect, &dstRect);
-
-	srcRect = { 0, 0, 2000, 2000 };
-	dstRect = {0, 0, 400, 400 };
-	SDL_RenderCopy(pRenderer, m_pKeyInputTexture, &srcRect, &dstRect);
 }
 
 void LoseState::Exit()
 {
 	std::cout << "Exiting LoseState..." << std::endl;
-	SDL_DestroyTexture(m_pBackGroundTexture);
-	SDL_DestroyTexture(m_pTitleTexture);
-	SDL_DestroyTexture(m_pKeyInputTexture);
 }
 // End LoseState
