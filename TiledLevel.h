@@ -22,8 +22,10 @@ public:
     
     ~TiledLevel();
     
-    void Update(float deltaTime) override;
-    void Render() override;
+    virtual void Update(float deltaTime) override;
+    virtual void Render() override;
+
+    std::vector<Tile*>& GetObstacles() { return m_obstacles; }
 
 };
 

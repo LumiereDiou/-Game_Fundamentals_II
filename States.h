@@ -3,6 +3,8 @@
 #include <vector>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <string>
+#include <map>
 
 class GameObject;
 class AnimatedSprite;
@@ -19,6 +21,9 @@ public:
 	virtual void Render() = 0;
 	virtual void Exit() = 0;
 	virtual void Resume() { };
+
+	std::map<std::string, GameObject*> m_objects;
+
 };
 
 class TitleState : public State
@@ -64,7 +69,7 @@ class GameState : public State
 {
 	static const int kPlayerSpeed = 400;
 	float timer = 0.0f;
-	TiledLevel* m_pLevel;
+
 	Mix_Music* m_pMusic;
 	Mix_Chunk* m_pSoundEffect;
 

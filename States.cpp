@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "EventManager.h"
 #include "TiledLevel.h"
+#include "PlatformingPlayer.h"
 #include <iostream>
 
 
@@ -174,13 +175,15 @@ void GameState::Enter() // Used for initialization
 	std::cout << "Entering GameState..." << std::endl;
 	
 	TextureManager::Load("assets/Images/Tiles.png", "tiles");
-
-	m_pLevel = new TiledLevel(24, 32, 32, 32, "assets/Data/Tiledata.txt", "assets/Data/Level1.txt", "tiles");
+	TextureManager::Load("assets/Images/Player.png", "player");
 
 	m_pMusic = Mix_LoadMUS("assets/music.wav");
 	m_pSoundEffect = Mix_LoadWAV("assets/jump.wav");
 
 	Mix_PlayMusic(m_pMusic, -1);
+
+	m_objects.emplace("level", new TiledLevel(24, 32, 32, 32, "assets/Data/Tiledata.txt", "assets/Data/Level1.txt", "tiles"));
+	m_objects.emplace("player", new PlatformPlayer({0, 0, 128, 128}, {288, 480, 64, 64}));
 
 }
 
@@ -193,8 +196,6 @@ void GameState::Update(float deltaTime)
 		StateManager::ChangeState(new WinState());
 	}
 
-	Game& GameInstance = Game::GetInstance();
-
 	if (EventManager::KeyPressed(SDL_SCANCODE_P))
 	{
 		std::cout << "Changing to PauseState..." << std::endl;
@@ -203,7 +204,11 @@ void GameState::Update(float deltaTime)
 	}
 	else
 	{
-		m_pLevel->Update(deltaTime);
+		//m_pLevel->Update(deltaTime);
+		for (auto object : m_objects)
+		{
+			object.second->Update(deltaTime);
+		}
 	}
 	
 }
@@ -216,17 +221,26 @@ void GameState::Render()
 	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
 	SDL_RenderClear(pRenderer);
 	
-	m_pLevel->Render();
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 }
 
 void GameState::Exit()
 {
 	std::cout << "Exiting GameState..." << std::endl;
 
-	delete m_pLevel;
-	m_pLevel = nullptr;
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+
+	m_objects.clear();
 
 	TextureManager::Unload("tiles");
+	TextureManager::Unload("player");
 
 	Mix_FreeMusic(m_pMusic);
 	m_pMusic = nullptr;
