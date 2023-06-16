@@ -12,6 +12,7 @@
 #include "PlatformingPlayer.h"
 #include "BackgroundSprite.h"
 #include "PlayButton.h"
+#include "CreditButton.h"
 #include <iostream>
 
 
@@ -25,13 +26,8 @@ void TitleState::Enter()
 
 	TextureManager::Load("assets/Images/titleScreen.jpg", "title");
 
-	int buttonWidth = 1280;
-	int buttonHeight = 720;
-	float buttonX = Game::GetInstance().kWidth;
-	float buttonY = Game::GetInstance().kHeight;
-
 	SDL_Rect source{ 0, 0, 1280 , 720 };
-	SDL_FRect destination{ 0, 0, (float)Game::GetInstance().kWidth, (float)Game::GetInstance().kHeight };
+	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
 
 	m_objects.emplace("title", new BackgroundSprite(source, destination, "title"));
 
@@ -50,8 +46,6 @@ void TitleState::Update(float deltaTime)
 
 void TitleState::Render()
 {
-	SDL_RenderClear(Game::GetInstance().GetRenderer());
-
 	for (auto object : m_objects)
 	{
 		object.second->Render();
@@ -80,6 +74,44 @@ void MenuState::Enter() // Used for initialization
 {
 	std::cout << "Entering MenuState..." << std::endl;
 
+	SoundManager::ResumeMusic();
+
+	TextureManager::Load("assets/Images/menuScreen.jpg", "menu");
+
+	SDL_Rect source{ 0, 0, 1280 , 720 };
+	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
+
+	m_pMenuBackground = new BackgroundSprite(source, destination, "menu");
+	//m_objects.emplace("menu", new BackgroundSprite(source, destination, "menu"));
+
+	TextureManager::Load("assets/Images/Buttons/credit.png", "credit");
+	
+	int srcWidth = 399;
+	int srcHeight = 82;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth / 2.0f + dstWidth / 2.0f - 100.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+	
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+	
+	m_objects.emplace("credit", new CreditButton(cSource, cDestination, "credit"));
+
+	TextureManager::Load("assets/Images/Buttons/play.png", "play");
+
+	srcWidth = 400;
+	srcHeight = 100;
+	dstWidth = 250;
+	dstHeight = 50;
+	buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth;
+	buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+
+	cSource = { 0, 0, srcWidth , srcHeight };
+	cDestination = { buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("play", new PlayButton(cSource, cDestination, "play"));
+
 	//TextureManager::Load("assets/Images/Buttons/play.png", "play");
 	//
 	//int buttonWidth = 400;
@@ -95,7 +127,6 @@ void MenuState::Enter() // Used for initialization
 
 void MenuState::Update(float deltaTime)
 {
-
 	for (auto object : m_objects)
 	{
 		object.second->Update(deltaTime);
@@ -106,17 +137,29 @@ void MenuState::Update(float deltaTime)
 	}
 }
 
-
 void MenuState::Render()
 {
-	SDL_RenderClear(Game::GetInstance().GetRenderer());
+	m_pMenuBackground->Render();
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 }
 
 void MenuState::Exit()
 {
 	std::cout << "Exiting MenuState..." << std::endl;
-	SoundManager::StopMusic();
-	SoundManager::UnloadMusic("MainMenuMusic");
+	
+	SoundManager::PauseMusic();
+
+	TextureManager::Unload("menu");
+
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+	m_objects.clear();
 }
 // End MenuState
 
@@ -148,6 +191,9 @@ void GameState::Enter() // Used for initialization
 {
 	std::cout << "Entering GameState..." << std::endl;
 	
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("MainMenuMusic");
+
 	TextureManager::Load("assets/Images/Tiles.png", "tiles");
 	TextureManager::Load("assets/Images/Player.png", "player");
 

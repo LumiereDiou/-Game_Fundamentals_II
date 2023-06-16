@@ -7,6 +7,7 @@
 #include <map>
 
 class GameObject;
+class BackgroundSprite;
 class AnimatedSprite;
 class TiledLevel;
 
@@ -39,6 +40,7 @@ public:
 
 class MenuState : public State
 {
+	BackgroundSprite* m_pMenuBackground = nullptr;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
