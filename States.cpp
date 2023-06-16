@@ -10,6 +10,7 @@
 #include "TiledLevel.h"
 #include "Tile.h"
 #include "PlatformingPlayer.h"
+#include "PlayButton.h"
 #include <iostream>
 
 
@@ -20,16 +21,38 @@ void TitleState::Enter()
 	m_pDeveloperTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/profile.jpg");
 	SoundManager::LoadMusic("assets/Sound/Music/Menu.mp3", "MainMenuMusic");
 	SoundManager::PlayMusic("MainMenuMusic");
+
+	TextureManager::Load("assets/Images/Buttons/play.png", "play");
+
+	int buttonWidth = 400;
+	int buttonHeight = 100;
+	float buttonX = Game::GetInstance().kWidth / 2.0f - buttonWidth / 2.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f - buttonHeight / 2.0f;
+
+	SDL_Rect source{ 0, 0, buttonWidth , buttonHeight };
+	SDL_FRect destination{ buttonX, buttonY, (float)buttonWidth, (float)buttonHeight };
+
+	m_objects.emplace("play", new PlayButton(source, destination, "play"));
+
 }
 
 void TitleState::Update(float deltaTime)
 {
 	timer += deltaTime;
 
-	if (timer >= 4.0f)
+	for (auto object : m_objects)
 	{
-		StateManager::ChangeState(new MenuState());
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			//StateManager::ChangeState(new GameState());
+			return;
+		}
 	}
+	//if (timer >= 4.0f)
+	//{
+	//	StateManager::ChangeState(new MenuState());
+	//}
 	
 }
 
@@ -40,9 +63,14 @@ void TitleState::Render()
 	SDL_SetRenderDrawColor(Game::GetInstance().GetRenderer(), 255, 255, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(Game::GetInstance().GetRenderer());
 
-	SDL_Rect srcRect{ 0, 0, 826, 842 };
-	SDL_Rect dstRect{ (1024/2) - 200,(768/2) - 200,400, 400};
-	SDL_RenderCopy(pRenderer, m_pDeveloperTexture, &srcRect, &dstRect);
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
+
+	//SDL_Rect srcRect{ 0, 0, 826, 842 };
+	//SDL_Rect dstRect{ (1024/2) - 200,(768/2) - 200,400, 400};
+	//SDL_RenderCopy(pRenderer, m_pDeveloperTexture, &srcRect, &dstRect);
 }
 
 void TitleState::Exit()
@@ -51,6 +79,14 @@ void TitleState::Exit()
 	SDL_DestroyTexture(m_pDeveloperTexture);
 	SoundManager::StopMusic();
 	SoundManager::UnloadMusic("MainMenuMusic");
+
+	TextureManager::Unload("play");
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+	m_objects.clear();
 }
 // End TitleState
 

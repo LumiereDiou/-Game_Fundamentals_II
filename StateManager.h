@@ -8,6 +8,7 @@ class StateManager
 {
 private: // Public properties
 	static std::vector<State*> s_states;
+	static bool s_stateChange;
 
 public: // Public methods
 	static void Update(float deltaTime);
@@ -17,6 +18,7 @@ public: // Public methods
 	static void ChangeState(State* pState);
 	static void Quit(); // Used for cleanup
 	static std::vector<State*>& GetStates(); //returns a reference to our State* vector
+	static bool IsStateChanging() { return s_stateChange; }
 
 private: //Private methods
 	StateManager() {}
