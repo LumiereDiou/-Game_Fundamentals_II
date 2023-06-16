@@ -58,7 +58,7 @@ void PlatformPlayer::Update(float deltaTime)
 		else if (EventManager::KeyHeld(SDL_SCANCODE_D) && m_destinationTransform.x < Game::kWidth - m_destinationTransform.w)
 		{
 			m_accelX = s_kAccelerationX;
-			if (!m_facingLeft)
+			if (m_facingLeft)
 				m_facingLeft = false;
 		}
 		//transition to jump
@@ -84,7 +84,7 @@ void PlatformPlayer::Update(float deltaTime)
 		else if (EventManager::KeyHeld(SDL_SCANCODE_D) && m_destinationTransform.x < Game::kWidth - m_destinationTransform.w)
 		{
 			m_accelX = s_kAccelerationX;
-			if (!m_facingLeft)
+			if (m_facingLeft)
 				m_facingLeft = false;
 		}
 		//hit ground, transition to run

@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "EventManager.h"
 #include "TiledLevel.h"
+#include "Tile.h"
 #include "PlatformingPlayer.h"
 #include <iostream>
 
@@ -195,8 +196,7 @@ void GameState::Update(float deltaTime)
 	{
 		StateManager::ChangeState(new WinState());
 	}
-
-	if (EventManager::KeyPressed(SDL_SCANCODE_P))
+	else if (EventManager::KeyPressed(SDL_SCANCODE_P))
 	{
 		std::cout << "Changing to PauseState..." << std::endl;
 		StateManager::PushState(new PauseState()); // Add new PauseState
@@ -205,9 +205,62 @@ void GameState::Update(float deltaTime)
 	else
 	{
 		//m_pLevel->Update(deltaTime);
-		for (auto object : m_objects)
+		for (auto const& object : m_objects)
 		{
 			object.second->Update(deltaTime);
+		}
+
+		for (unsigned int i = 0; i < static_cast<TiledLevel*> (m_objects["level"])->GetObstacles().size(); i++)
+		{
+			SDL_FRect* obstacleColliderTransfrom = static_cast<TiledLevel*>(m_objects["level"])->GetObstacles()[i]->GetDestinationTransform();
+
+			float obstacleLeft = obstacleColliderTransfrom->x;
+			float obstacleRight = obstacleColliderTransfrom->x + obstacleColliderTransfrom->w;
+
+			float obstacleTop = obstacleColliderTransfrom->y;
+			float obstacleBottom = obstacleColliderTransfrom->y + obstacleColliderTransfrom->h;
+
+			SDL_FRect* playerColliderTransfrom = m_objects["player"]->GetDestinationTransform();
+
+			float playerLeft = playerColliderTransfrom->x;
+			float playerRight = playerColliderTransfrom->x + playerColliderTransfrom->w;
+
+			float playerTop = playerColliderTransfrom->y;
+			float playerBottom = playerColliderTransfrom->y + playerColliderTransfrom->h;
+
+			bool xOverlap = playerLeft < obstacleRight&& playerRight > obstacleLeft;
+			bool yOverlap = playerTop < obstacleBottom&& playerBottom > obstacleTop;
+
+			float bottomCollision = obstacleBottom - playerColliderTransfrom->y;
+			float topCollision = playerBottom - obstacleColliderTransfrom->y;
+			float leftCollision = playerRight - obstacleColliderTransfrom->x;
+			float rightCollision = obstacleRight - playerColliderTransfrom->x;
+
+			if (xOverlap && yOverlap)
+			{
+				PlatformPlayer* pPlayer = static_cast<PlatformPlayer*>(m_objects["player"]);
+				if (topCollision < bottomCollision && topCollision < leftCollision && topCollision < rightCollision)
+				{
+					pPlayer->StopY();
+					pPlayer->SetY(playerColliderTransfrom->y - topCollision);
+					pPlayer->SetGrounded(true);
+				}
+				if (bottomCollision < topCollision && bottomCollision < leftCollision && bottomCollision < rightCollision)
+				{
+					pPlayer->StopY();
+					pPlayer->SetY(playerColliderTransfrom->y + bottomCollision);
+				}
+				if (leftCollision < rightCollision && leftCollision < topCollision && leftCollision < bottomCollision)
+				{
+					pPlayer->StopX();
+					pPlayer->SetX(playerColliderTransfrom->x - leftCollision);
+				}
+				if (rightCollision < leftCollision && rightCollision < topCollision && rightCollision < bottomCollision)
+				{
+					pPlayer->StopX();
+					pPlayer->SetX(playerColliderTransfrom->x + rightCollision);
+				}
+			}
 		}
 	}
 	
