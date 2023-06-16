@@ -24,6 +24,8 @@ public:
 	virtual void Resume() { };
 	virtual void Pause() { };
 
+	BackgroundSprite* m_pBackground = nullptr;
+
 	std::map<std::string, GameObject*> m_objects;
 
 };
@@ -40,7 +42,6 @@ public:
 
 class MenuState : public State
 {
-	BackgroundSprite* m_pMenuBackground = nullptr;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;

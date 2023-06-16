@@ -13,6 +13,7 @@
 #include "BackgroundSprite.h"
 #include "PlayButton.h"
 #include "CreditButton.h"
+#include "MenuButton.h"
 #include <iostream>
 
 
@@ -81,8 +82,7 @@ void MenuState::Enter() // Used for initialization
 	SDL_Rect source{ 0, 0, 1280 , 720 };
 	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
 
-	m_pMenuBackground = new BackgroundSprite(source, destination, "menu");
-	//m_objects.emplace("menu", new BackgroundSprite(source, destination, "menu"));
+	m_pBackground = new BackgroundSprite(source, destination, "menu");
 
 	TextureManager::Load("assets/Images/Buttons/credit.png", "credit");
 	
@@ -112,17 +112,6 @@ void MenuState::Enter() // Used for initialization
 
 	m_objects.emplace("play", new PlayButton(cSource, cDestination, "play"));
 
-	//TextureManager::Load("assets/Images/Buttons/play.png", "play");
-	//
-	//int buttonWidth = 400;
-	//int buttonHeight = 100;
-	//float buttonX = Game::GetInstance().kWidth / 2.0f - buttonWidth / 2.0f;
-	//float buttonY = Game::GetInstance().kHeight / 2.0f - buttonHeight / 2.0f;
-	//
-	//SDL_Rect source{ 0, 0, buttonWidth , buttonHeight };
-	//SDL_FRect destination{ buttonX, buttonY, (float)buttonWidth, (float)buttonHeight };
-	//
-	//m_objects.emplace("play", new PlayButton(source, destination, "play"));
 }
 
 void MenuState::Update(float deltaTime)
@@ -139,7 +128,7 @@ void MenuState::Update(float deltaTime)
 
 void MenuState::Render()
 {
-	m_pMenuBackground->Render();
+	m_pBackground->Render();
 	for (auto object : m_objects)
 	{
 		object.second->Render();
@@ -153,12 +142,17 @@ void MenuState::Exit()
 	SoundManager::PauseMusic();
 
 	TextureManager::Unload("menu");
+	TextureManager::Unload("credit");
+	TextureManager::Unload("play");
 
 	for (auto object : m_objects)
 	{
 		delete object.second;
 		object.second = nullptr;
 	}
+
+	delete m_pBackground;
+	m_pBackground = nullptr;
 	m_objects.clear();
 }
 // End MenuState
@@ -167,22 +161,70 @@ void MenuState::Exit()
 void CreditState::Enter() // Used for initialization
 {
 	std::cout << "Entering CreditState..." << std::endl;
+	
+	SoundManager::ResumeMusic();
+
+	TextureManager::Load("assets/Images/creditScreen.png", "credit");
+
+	SDL_Rect source{ 0, 0, 1306 , 737 };
+	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
+
+	m_pBackground = new BackgroundSprite(source, destination, "credit");
+
+	TextureManager::Load("assets/Images/Buttons/menu.png", "menu");
+
+	int srcWidth = 399;
+	int srcHeight = 82;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth / 2.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f + dstHeight / 2.0f;
+
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("menu", new MenuButton(cSource, cDestination, "menu"));
 }
 
 void CreditState::Update(float deltaTime)
 {
-
+	for (auto object : m_objects)
+	{
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			return;
+		}
+	}
 }
-
 
 void CreditState::Render()
 {
-	SDL_RenderClear(Game::GetInstance().GetRenderer());
+	m_pBackground->Render();
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 }
 
 void CreditState::Exit()
 {
 	std::cout << "Exiting CreditState..." << std::endl;
+	
+	SoundManager::PauseMusic();
+
+	TextureManager::Unload("menu");
+	TextureManager::Unload("credit");
+
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+
+	delete m_pBackground;
+	m_pBackground = nullptr;
+	m_objects.clear();
 }
 // End CreditState
 
