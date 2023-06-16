@@ -14,6 +14,9 @@
 #include "PlayButton.h"
 #include "CreditButton.h"
 #include "MenuButton.h"
+#include "PauseButton.h"
+#include "ResumeButton.h"
+#include "ExitButton.h"
 #include <iostream>
 
 
@@ -235,15 +238,25 @@ void GameState::Enter() // Used for initialization
 	
 	SoundManager::StopMusic();
 	SoundManager::UnloadMusic("MainMenuMusic");
-
-	TextureManager::Load("assets/Images/Tiles.png", "tiles");
-	TextureManager::Load("assets/Images/Player.png", "player");
-
 	SoundManager::LoadMusic("assets/Sound/Music/level.mp3", "levelMusic");
 	SoundManager::PlayMusic("levelMusic");
 
+	TextureManager::Load("assets/Images/Tiles.png", "tiles");
+	TextureManager::Load("assets/Images/Player.png", "player");
+	TextureManager::Load("assets/Images/Buttons/pause.png", "pause");
+
+	int srcWidth = 400;
+	int srcHeight = 85;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth - dstWidth;
+	float buttonY = 10;
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+	
 	m_objects.emplace("level", new TiledLevel(24, 32, 32, 32, "assets/Data/Tiledata.txt", "assets/Data/Level1.txt", "tiles"));
 	m_objects.emplace("player", new PlatformPlayer({0, 0, 128, 128}, {288, 480, 64, 64}));
+	m_objects.emplace("pause", new PauseButton(cSource, cDestination, "pause"));
 
 }
 
@@ -254,12 +267,6 @@ void GameState::Update(float deltaTime)
 	if (timer >= 20.0f)
 	{
 		StateManager::ChangeState(new WinState());
-	}
-	else if (EventManager::KeyPressed(SDL_SCANCODE_P))
-	{
-		std::cout << "Changing to PauseState..." << std::endl;
-		StateManager::PushState(new PauseState()); // Add new PauseState
-		Mix_PauseMusic();
 	}
 	else
 	{
@@ -327,12 +334,6 @@ void GameState::Update(float deltaTime)
 
 void GameState::Render()
 {
-	//std::cout << "Rendering GameState..." << std::endl;
-	SDL_Renderer* pRenderer = Game::GetInstance().GetRenderer();
-	
-	SDL_SetRenderDrawColor(pRenderer, 0, 0, 255, 255); //blue
-	SDL_RenderClear(pRenderer);
-	
 	for (auto object : m_objects)
 	{
 		object.second->Render();
@@ -353,6 +354,7 @@ void GameState::Exit()
 
 	TextureManager::Unload("tiles");
 	TextureManager::Unload("player");
+	TextureManager::Unload("pause");
 
 	SoundManager::StopMusic();
 	SoundManager::UnloadMusic("levelMusic");
@@ -376,14 +378,45 @@ void GameState::Resume()
 void PauseState::Enter()
 {
 	std::cout << "Entering PauseState..." << std::endl;
+
+	TextureManager::Load("assets/Images/Buttons/resume.png", "resume");
+
+	int srcWidth = 200;
+	int srcHeight = 80;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth / 2.0f + dstWidth / 2.0f - 100.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("resume", new ResumeButton(cSource, cDestination, "resume"));
+
+	TextureManager::Load("assets/Images/Buttons/exit.png", "exit");
+
+	srcWidth = 400;
+	srcHeight = 100;
+	dstWidth = 250;
+	dstHeight = 50;
+	buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth;
+	buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+
+	cSource = { 0, 0, srcWidth , srcHeight };
+	cDestination = { buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("exit", new ExitButton(cSource, cDestination, "exit"));
 }
 
 void PauseState::Update(float deltaTime)
 {
-	if (EventManager::KeyPressed(SDL_SCANCODE_ESCAPE))
+	for (auto object : m_objects)
 	{
-		StateManager::PopState();
-		Mix_ResumeMusic();
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			return;
+		}
 	}
 }
 
@@ -394,16 +427,32 @@ void PauseState::Render()
 	StateManager::GetStates().front()->Render();
 	// Now render rest of PauseState
 	SDL_SetRenderDrawBlendMode(pRenderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(pRenderer, 128, 128, 128, 128);
-	SDL_Rect rect = { 256, 128, 512, 512 };
-	SDL_RenderFillRect(pRenderer, &rect);
-	
+	//SDL_SetRenderDrawColor(pRenderer, 128, 128, 128, 128);
+	//SDL_Rect rect = { 256, 128, 512, 512 };
+	//SDL_RenderFillRect(pRenderer, &rect);
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 
 }
 
 void PauseState::Exit()
 {
 	std::cout << "Exiting PauseState..." << std::endl;
+	
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+
+	m_objects.clear();
+
+	TextureManager::Unload("exit");
+	TextureManager::Unload("resume");
+
+	//SoundManager::ResumeMusic();
 }
 // End PauseState
 
