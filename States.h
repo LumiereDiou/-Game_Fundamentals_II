@@ -21,6 +21,7 @@ public:
 	virtual void Render() = 0;
 	virtual void Exit() = 0;
 	virtual void Resume() { };
+	virtual void Pause() { };
 
 	std::map<std::string, GameObject*> m_objects;
 
@@ -70,15 +71,13 @@ class GameState : public State
 	static const int kPlayerSpeed = 400;
 	float timer = 0.0f;
 
-	Mix_Music* m_pMusic;
-	Mix_Chunk* m_pSoundEffect;
-
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
 	virtual void Render() override;
 	virtual void Exit() override;
 	virtual void Resume() override;
+	virtual void Pause() override;
 };
 
 class PauseState : public State

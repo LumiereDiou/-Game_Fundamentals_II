@@ -2,7 +2,7 @@
 #include "Game.h"
 #include "TextureManager.h"
 #include "EventManager.h"
-//#include "SoundManager.h"
+#include "SoundManager.h"
 #include <cmath>
 
 const float PlatformPlayer::s_kAccelerationX = 250;
@@ -23,11 +23,14 @@ PlatformPlayer::PlatformPlayer(SDL_Rect sourceTransform, SDL_FRect destinationTr
 	, m_state(PlayerState::kIdle)
 {
 	SetAnimation(0.1f, 0, 1, 256);
+	SoundManager::LoadSound("assets/Sound/Effects/jump.wav", "jump");
+	SoundManager::LoadSound("assets/Sound/Effects/land.wav", "land");
 }
 
 PlatformPlayer::~PlatformPlayer()
 {
-
+	SoundManager::UnloadSound("jump");
+	SoundManager::UnloadSound("land");
 }
 
 void PlatformPlayer::Update(float deltaTime)
@@ -92,6 +95,7 @@ void PlatformPlayer::Update(float deltaTime)
 		{
 			m_state = PlayerState::kRunning;
 			SetAnimation(0.1f, 0, 8, 256);
+			SoundManager::PlaySound("land");
 		}
 		break;
 	}
@@ -122,6 +126,7 @@ void PlatformPlayer::Render()
 
 void PlatformPlayer::Jump()
 {
+	SoundManager::PlaySound("jump");
 	m_accelY = -s_kJumpForce;
 	m_grounded = false;
 	m_state = PlayerState::kJumping;

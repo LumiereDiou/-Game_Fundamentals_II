@@ -4,6 +4,7 @@
 #include "States.h"
 #include "TextureManager.h"
 #include "EventManager.h"
+#include "SoundManager.h"
 
 
 Game::Game()
@@ -77,6 +78,20 @@ int Game::Init(const char* title, int xPos, int yPos)
 	{
 		std::cout << "Mix_OpenAudio() failed. Error: " << SDL_GetError() << std::endl;
 	}
+	
+	if (SoundManager::Init())
+	{
+		std::cout << "SoundManager::Init() succeeded." << std::endl;
+	}
+	else
+	{
+		std::cout << "SoundManager::Init() failed. Error: " << SDL_GetError() << std::endl;
+		SDL_DestroyRenderer(m_pRenderer);
+		SDL_DestroyWindow(m_pWindow);
+		SDL_Quit();
+		return -1;
+	}
+
 	std::cout << "Initialization successful!!!" << std::endl;
 	
 	EventManager::Init();
@@ -121,6 +136,7 @@ void Game::Clean()
 	StateManager::Quit();
 	TextureManager::Quit();
 	EventManager::Quit();
+	SoundManager::Quit();
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();

@@ -6,6 +6,7 @@
 #include "AnimatedSprite.h"
 #include "TextureManager.h"
 #include "EventManager.h"
+#include "SoundManager.h"
 #include "TiledLevel.h"
 #include "Tile.h"
 #include "PlatformingPlayer.h"
@@ -17,6 +18,8 @@ void TitleState::Enter()
 {
 	std::cout << "Entering TitleState..." << std::endl;
 	m_pDeveloperTexture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), "assets/profile.jpg");
+	SoundManager::LoadMusic("assets/Sound/Music/Menu.mp3", "MainMenuMusic");
+	SoundManager::PlayMusic("MainMenuMusic");
 }
 
 void TitleState::Update(float deltaTime)
@@ -46,6 +49,8 @@ void TitleState::Exit()
 {
 	std::cout << "Exiting TitleState..." << std::endl;
 	SDL_DestroyTexture(m_pDeveloperTexture);
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("MainMenuMusic");
 }
 // End TitleState
 
@@ -178,10 +183,8 @@ void GameState::Enter() // Used for initialization
 	TextureManager::Load("assets/Images/Tiles.png", "tiles");
 	TextureManager::Load("assets/Images/Player.png", "player");
 
-	m_pMusic = Mix_LoadMUS("assets/music.wav");
-	m_pSoundEffect = Mix_LoadWAV("assets/jump.wav");
-
-	Mix_PlayMusic(m_pMusic, -1);
+	SoundManager::LoadMusic("assets/Sound/Music/level.mp3", "levelMusic");
+	SoundManager::PlayMusic("levelMusic");
 
 	m_objects.emplace("level", new TiledLevel(24, 32, 32, 32, "assets/Data/Tiledata.txt", "assets/Data/Level1.txt", "tiles"));
 	m_objects.emplace("player", new PlatformPlayer({0, 0, 128, 128}, {288, 480, 64, 64}));
@@ -295,18 +298,21 @@ void GameState::Exit()
 	TextureManager::Unload("tiles");
 	TextureManager::Unload("player");
 
-	Mix_FreeMusic(m_pMusic);
-	m_pMusic = nullptr;
-
-	Mix_FreeChunk(m_pSoundEffect);
-	m_pSoundEffect = nullptr;
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("levelMusic");
 
 }
 
+void GameState::Pause()
+{
+	std::cout << "Pausing GameState..." << std::endl;
+	SoundManager::PauseMusic();
+}
 
 void GameState::Resume()
 {
 	std::cout << "Resuming GameState..." << std::endl;
+	SoundManager::ResumeMusic();
 }
 // End GameState
 
