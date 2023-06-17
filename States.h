@@ -7,6 +7,7 @@
 #include <map>
 
 class GameObject;
+class BackgroundSprite;
 class AnimatedSprite;
 class TiledLevel;
 
@@ -23,13 +24,14 @@ public:
 	virtual void Resume() { };
 	virtual void Pause() { };
 
+	BackgroundSprite* m_pBackground = nullptr;
+
 	std::map<std::string, GameObject*> m_objects;
 
 };
 
 class TitleState : public State
 {
-	SDL_Texture* m_pDeveloperTexture;
 	float timer = 0.0f;
 public:
 	virtual void Enter() override;
@@ -40,11 +42,6 @@ public:
 
 class MenuState : public State
 {
-	SDL_Texture* m_pBackGroundTexture;
-	SDL_Texture* m_pGameNameTexture;
-	SDL_Texture* m_pKeyInputTexture;
-
-	Mix_Music* m_pMusic;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
@@ -54,11 +51,6 @@ public:
 
 class CreditState : public State
 {
-	SDL_Texture* m_pTitleTexture;
-	SDL_Texture* m_pNameTexture;
-	SDL_Texture* m_pKeyInputTexture;
-
-	Mix_Music* m_pMusic;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
@@ -82,11 +74,6 @@ public:
 
 class PauseState : public State
 {
-	SDL_Texture* m_pTitleTexture;
-	SDL_Texture* m_pBackGroundTexture;
-	SDL_Texture* m_pKeyInputTexture;
-
-	Mix_Music* m_pMusic;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
@@ -96,9 +83,6 @@ public:
 
 class WinState : public State
 {
-	SDL_Texture* m_pTitleTexture;
-	SDL_Texture* m_pBackGroundTexture;
-	SDL_Texture* m_pKeyInputTexture;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;
@@ -108,9 +92,6 @@ public:
 
 class LoseState : public State
 {
-	SDL_Texture* m_pTitleTexture;
-	SDL_Texture* m_pBackGroundTexture;
-	SDL_Texture* m_pKeyInputTexture;
 public:
 	virtual void Enter() override;
 	virtual void Update(float deltaTime) override;

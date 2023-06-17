@@ -41,6 +41,7 @@ void UI_Button::Update(float deltaTime)
 		else if (mouseOverlap && EventManager::MousePressed(1))
 		{
 			m_state = ButtonState::STATE_DOWN; //1 is left mouse
+			Execute();
 		}
 		break;
 	case ButtonState::STATE_DOWN:
@@ -49,7 +50,6 @@ void UI_Button::Update(float deltaTime)
 			if (mouseOverlap)
 			{
 				m_state = ButtonState::STATE_OVER;
-				Execute();
 			}
 		}
 		else
