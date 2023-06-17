@@ -3,9 +3,10 @@
 
 class PlatformPlayer : public AnimatedSpriteObject
 {
-	enum class PlayerState { kIdle, kRunning, kJumping };
+	enum class PlayerState { kIdle, kRunning, kJumping, kDead };
 
 	bool m_grounded;
+	bool m_dead;
 	bool m_facingLeft;
 	float m_accelX;
 	float m_accelY;
@@ -25,6 +26,7 @@ public:
 	~PlatformPlayer();
 	virtual void Update(float deltaTime) override;
 	virtual void Render() override;
+	void Dead();
 	void Jump();
 	void Stop();
 
@@ -33,6 +35,7 @@ public:
 	void SetAccelX(float a) { m_accelX = a; }
 	void SetAccelY(float a) { m_accelY = a; }
 	bool IsGrounded() { return m_grounded; }
+	bool IsDead() { return m_dead; }
 	void SetGrounded(bool g) { m_grounded = g; }
 	float GetVelX() { return m_velX; }
 	float GetVelY() { return m_velY; }

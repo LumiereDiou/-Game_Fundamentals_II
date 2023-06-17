@@ -21,6 +21,7 @@ public:
     }
 
     bool IsObstacle() { return m_obstacle; }
+    bool IsHazard() { return m_hazard; }
     void SetXY(float x, float y) { m_destinationTransform.x = x, m_destinationTransform.y = y; }
     void Update(float deltaTime) override {}
     void Render() override {}

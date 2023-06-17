@@ -14,6 +14,7 @@ const float PlatformPlayer::s_kDragX = 0.8f;
 
 PlatformPlayer::PlatformPlayer(SDL_Rect sourceTransform, SDL_FRect destinationTransform)
 	: AnimatedSpriteObject(sourceTransform, destinationTransform)
+	, m_dead(false)
 	, m_grounded(false)
 	, m_facingLeft(false)
 	, m_accelX(0)
@@ -98,6 +99,10 @@ void PlatformPlayer::Update(float deltaTime)
 			SoundManager::PlaySound("land");
 		}
 		break;
+	case PlayerState::kDead:
+		SetAnimation(0.1f, 0, 8, 386);
+		m_dead = true;
+		break;
 	}
 
 	//player movement x axis first
@@ -123,6 +128,12 @@ void PlatformPlayer::Render()
 		&m_sourceTransfrom, &m_destinationTransform, 0.0, nullptr, (m_facingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 }
 
+void PlatformPlayer::Dead()
+{
+	m_state = PlayerState::kDead;
+	m_dead = true;
+	SetAnimation(0.1f, 0, 8, 386);
+}
 
 void PlatformPlayer::Jump()
 {

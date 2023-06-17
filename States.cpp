@@ -77,6 +77,11 @@ void TitleState::Exit()
 void MenuState::Enter() // Used for initialization
 {
 	std::cout << "Entering MenuState..." << std::endl;
+	if (!Mix_PlayingMusic())
+	{
+		SoundManager::LoadMusic("assets/Sound/Music/Menu.mp3", "MainMenuMusic");
+		SoundManager::PlayMusic("MainMenuMusic");
+	}
 
 	SoundManager::ResumeMusic();
 
@@ -327,6 +332,69 @@ void GameState::Update(float deltaTime)
 				}
 			}
 		}
+
+		for (unsigned int i = 0; i < static_cast<TiledLevel*> (m_objects["level"])->GetHazards().size(); i++)
+		{
+			SDL_FRect* obstacleColliderTransfrom = static_cast<TiledLevel*>(m_objects["level"])->GetHazards()[i]->GetDestinationTransform();
+
+			float obstacleLeft = obstacleColliderTransfrom->x;
+			float obstacleRight = obstacleColliderTransfrom->x + obstacleColliderTransfrom->w;
+
+			float obstacleTop = obstacleColliderTransfrom->y;
+			float obstacleBottom = obstacleColliderTransfrom->y + obstacleColliderTransfrom->h;
+
+			SDL_FRect* playerColliderTransfrom = m_objects["player"]->GetDestinationTransform();
+
+			float playerLeft = playerColliderTransfrom->x;
+			float playerRight = playerColliderTransfrom->x + playerColliderTransfrom->w;
+
+			float playerTop = playerColliderTransfrom->y;
+			float playerBottom = playerColliderTransfrom->y + playerColliderTransfrom->h;
+
+			bool xOverlap = playerLeft < obstacleRight&& playerRight > obstacleLeft;
+			bool yOverlap = playerTop < obstacleBottom&& playerBottom > obstacleTop;
+
+			float bottomCollision = obstacleBottom - playerColliderTransfrom->y;
+			float topCollision = playerBottom - obstacleColliderTransfrom->y;
+			float leftCollision = playerRight - obstacleColliderTransfrom->x;
+			float rightCollision = obstacleRight - playerColliderTransfrom->x;
+
+			if (xOverlap && yOverlap)
+			{
+				PlatformPlayer* pPlayer = static_cast<PlatformPlayer*>(m_objects["player"]);
+				if (topCollision < bottomCollision && topCollision < leftCollision && topCollision < rightCollision)
+				{
+					pPlayer->Dead();
+					break;
+
+				}
+				if (bottomCollision < topCollision && bottomCollision < leftCollision && bottomCollision < rightCollision)
+				{
+					pPlayer->Dead();
+					break;
+				}
+				if (leftCollision < rightCollision && leftCollision < topCollision && leftCollision < bottomCollision)
+				{
+					pPlayer->Dead();
+					break;
+				}
+				if (rightCollision < leftCollision && rightCollision < topCollision && rightCollision < bottomCollision)
+				{
+					pPlayer->Dead();
+					break;
+				}
+			}
+		}
+		PlatformPlayer* pPlayer = static_cast<PlatformPlayer*>(m_objects["player"]);
+		if (pPlayer->IsDead())
+		{
+			if (timer >= 4.0f)
+			{
+				StateManager::ChangeState(new LoseState());
+			}
+			
+		}
+
 	}
 	
 }
@@ -562,7 +630,7 @@ void LoseState::Enter() // Used for initialization
 	int dstWidth = 250;
 	int dstHeight = 50;
 	float buttonX = Game::GetInstance().kWidth / 2.0f + dstWidth / 2.0f - 100.0f;
-	float buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f + dstHeight / 2.0f;
 
 	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
 	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
@@ -576,7 +644,7 @@ void LoseState::Enter() // Used for initialization
 	dstWidth = 250;
 	dstHeight = 50;
 	buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth;
-	buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+	buttonY = Game::GetInstance().kHeight / 2.0f + dstHeight / 2.0f;
 
 	cSource = { 0, 0, srcWidth , srcHeight };
 	cDestination = { buttonX, buttonY, (float)dstWidth, (float)dstHeight };
@@ -619,5 +687,8 @@ void LoseState::Exit()
 	m_pBackground = nullptr;
 	TextureManager::Unload("exit");
 	TextureManager::Unload("menu");
+
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("winOrLose");
 }
 // End LoseState

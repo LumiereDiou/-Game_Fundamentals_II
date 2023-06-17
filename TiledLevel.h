@@ -16,6 +16,7 @@ private:
     std::map<char, Tile*> m_tiles;
     std::vector<std::vector<Tile*>> m_levelTiles; //2D vector
     std::vector<Tile*> m_obstacles;
+    std::vector<Tile*> m_hazards;
 
 public:
     TiledLevel(int rows, int cols, int tileWidth, int tileHeight, const char* tileData, const char* levelData, const char* tileKey);
@@ -26,6 +27,7 @@ public:
     virtual void Render() override;
 
     std::vector<Tile*>& GetObstacles() { return m_obstacles; }
+    std::vector<Tile*>& GetHazards() { return m_hazards; }
 
 };
 

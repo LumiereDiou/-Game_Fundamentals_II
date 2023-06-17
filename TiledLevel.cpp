@@ -45,6 +45,10 @@ TiledLevel::TiledLevel(int rows, int cols, int tileWidth, int tileHeight,
 				{
 					m_obstacles.push_back(m_levelTiles[row][col]);
 				}
+				if (m_levelTiles[row][col]->IsHazard())
+				{
+					m_hazards.push_back(m_levelTiles[row][col]);
+				}
 			}
 		}
 	}
@@ -65,6 +69,7 @@ TiledLevel::~TiledLevel()
 	}
 	m_levelTiles.clear();
 	m_obstacles.clear();
+	m_hazards.clear();
 	//clear the original tiles
 	for (std::map<char, Tile*>::iterator i = m_tiles.begin(); i != m_tiles.end(); i++)
 	{
