@@ -270,7 +270,6 @@ void GameState::Update(float deltaTime)
 	}
 	else
 	{
-		//m_pLevel->Update(deltaTime);
 		for (auto const& object : m_objects)
 		{
 			object.second->Update(deltaTime);
@@ -452,7 +451,6 @@ void PauseState::Exit()
 	TextureManager::Unload("exit");
 	TextureManager::Unload("resume");
 
-	//SoundManager::ResumeMusic();
 }
 // End PauseState
 
@@ -460,22 +458,85 @@ void PauseState::Exit()
 void WinState::Enter() // Used for initialization
 {
 	std::cout << "Entering WinState..." << std::endl;
+
+	SoundManager::LoadMusic("assets/Sound/Music/winOrLose.mp3", "winOrLose");
+	SoundManager::PlayMusic("winOrLose");
+
+	TextureManager::Load("assets/Images/winScreen.png", "win");
+
+	SDL_Rect source{ 0, 0, 1275 , 722 };
+	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
+
+	m_pBackground = new BackgroundSprite(source, destination, "win");
+
+	TextureManager::Load("assets/Images/Buttons/menu.png", "menu");
+
+	int srcWidth = 399;
+	int srcHeight = 82;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth / 2.0f + dstWidth / 2.0f - 100.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f + dstHeight / 2.0f;
+
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("menu", new MenuButton(cSource, cDestination, "menu"));
+
+	TextureManager::Load("assets/Images/Buttons/exit.png", "exit");
+
+	srcWidth = 400;
+	srcHeight = 100;
+	dstWidth = 250;
+	dstHeight = 50;
+	buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth;
+	buttonY = Game::GetInstance().kHeight / 2.0f + dstHeight / 2.0f;
+
+	cSource = { 0, 0, srcWidth , srcHeight };
+	cDestination = { buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("exit", new ExitButton(cSource, cDestination, "exit"));
 }
 
 void WinState::Update(float deltaTime)
 {
-
+	for (auto object : m_objects)
+	{
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			return;
+		}
+	}
 }
 
 
 void WinState::Render()
 {
-	SDL_RenderClear(Game::GetInstance().GetRenderer());
+	m_pBackground->Render();
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 }
 
 void WinState::Exit()
 {
 	std::cout << "Exiting WinState..." << std::endl;
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+
+	m_objects.clear();
+	delete m_pBackground;
+	m_pBackground = nullptr;
+	TextureManager::Unload("exit");
+	TextureManager::Unload("menu");
+	SoundManager::StopMusic();
+	SoundManager::UnloadMusic("winOrLose");
+
 }
 // End WinState
 
@@ -483,20 +544,80 @@ void WinState::Exit()
 void LoseState::Enter() // Used for initialization
 {
 	std::cout << "Entering LoseState..." << std::endl;
+
+	SoundManager::LoadMusic("assets/Sound/Music/winOrLose.mp3", "winOrLose");
+	SoundManager::PlayMusic("winOrLose");
+
+	TextureManager::Load("assets/Images/loseScreen.png", "lose");
+
+	SDL_Rect source{ 0, 0, 1277 , 718 };
+	SDL_FRect destination{ 0, 0, Game::GetInstance().kWidth, Game::GetInstance().kHeight };
+
+	m_pBackground = new BackgroundSprite(source, destination, "lose");
+
+	TextureManager::Load("assets/Images/Buttons/menu.png", "menu");
+
+	int srcWidth = 399;
+	int srcHeight = 82;
+	int dstWidth = 250;
+	int dstHeight = 50;
+	float buttonX = Game::GetInstance().kWidth / 2.0f + dstWidth / 2.0f - 100.0f;
+	float buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+
+	SDL_Rect cSource{ 0, 0, srcWidth , srcHeight };
+	SDL_FRect cDestination{ buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("menu", new MenuButton(cSource, cDestination, "menu"));
+
+	TextureManager::Load("assets/Images/Buttons/exit.png", "exit");
+
+	srcWidth = 400;
+	srcHeight = 100;
+	dstWidth = 250;
+	dstHeight = 50;
+	buttonX = Game::GetInstance().kWidth / 2.0f - dstWidth;
+	buttonY = Game::GetInstance().kHeight / 2.0f - dstHeight / 2.0f;
+
+	cSource = { 0, 0, srcWidth , srcHeight };
+	cDestination = { buttonX, buttonY, (float)dstWidth, (float)dstHeight };
+
+	m_objects.emplace("exit", new ExitButton(cSource, cDestination, "exit"));
 }
 
 void LoseState::Update(float deltaTime)
 {
-
+	for (auto object : m_objects)
+	{
+		object.second->Update(deltaTime);
+		if (StateManager::IsStateChanging())
+		{
+			return;
+		}
+	}
 }
 
 void LoseState::Render()
 {
-	SDL_RenderClear(Game::GetInstance().GetRenderer());
+	m_pBackground->Render();
+	for (auto object : m_objects)
+	{
+		object.second->Render();
+	}
 }
 
 void LoseState::Exit()
 {
 	std::cout << "Exiting LoseState..." << std::endl;
+	for (auto object : m_objects)
+	{
+		delete object.second;
+		object.second = nullptr;
+	}
+
+	m_objects.clear();
+	delete m_pBackground;
+	m_pBackground = nullptr;
+	TextureManager::Unload("exit");
+	TextureManager::Unload("menu");
 }
 // End LoseState
